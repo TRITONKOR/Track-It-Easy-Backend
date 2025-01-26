@@ -1,0 +1,41 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+        "dev": "tsx src/server.ts",
+        "build": "tsx",
+        "start": "node dist/server.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "typeorm": "typeorm-ts-node-commonjs -d ./src/config/data-source.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@fastify/cookie": "^8.2.0",
+        "@fastify/request-context": "^4.2.0",
+        "@mgcrea/fastify-request-logger": "^1.9.0",
+        "@mgcrea/pino-pretty-compact": "^1.4.2",
+        "axios": "^1.7.9",
+        "bcrypt": "^5.1.1",
+        "bcryptjs": "^2.4.3",
+        "dotenv": "^16.4.7",
+        "fastify": "^4.29.0",
+        "jsonwebtoken": "^9.0.2",
+        "pg": "^8.13.1",
+        "reflect-metadata": "^0.2.2"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^5.0.2",
+        "@types/bcryptjs": "^2.4.6",
+        "@types/jsonwebtoken": "^9.0.7",
+        "@types/node": "^22.10.3",
+        "ts-node": "^10.9.2",
+        "tsconfig-paths": "^4.2.0",
+        "tsx": "^4.19.2",
+        "typeorm": "^0.3.20",
+        "typescript": "^5.7.2"
+    }
+}
