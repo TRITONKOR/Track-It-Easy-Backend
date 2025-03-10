@@ -13,8 +13,7 @@ export class TrackingService {
         this.ukrPoshtaAdapter = ukrPoshtaAdapter;
     }
 
-    async trackPackage(courier: "nova" | "ukr", trackingNumber: string) {
-        console.log("service " + courier);
+    async trackParcel(courier: "nova" | "ukr", trackingNumber: string) {
         if (courier === "nova") {
             return this.novaPoshtaAdapter.getTrackingInfo(trackingNumber);
         } else if (courier === "ukr") {

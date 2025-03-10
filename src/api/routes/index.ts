@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { authRouter } from "./auth";
-import { trackRouter } from "./track";
+import { parcelRouter } from "./parcel";
 
 export const patchRouting = (fastify: FastifyInstance) => {
     fastify.setNotFoundHandler((request, reply) => {
@@ -27,5 +27,5 @@ export const patchRouting = (fastify: FastifyInstance) => {
 
 const registerRoutes = (fastify: FastifyInstance) => {
     fastify.register(authRouter);
-    fastify.register(trackRouter);
+    fastify.register(parcelRouter);
 };

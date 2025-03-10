@@ -1,5 +1,7 @@
 export enum ActionType {
-    BAN = "Ban",
-    UNBAN = "Unban",
-    DEL_PARCEL = "Delete parcel",
+    BAN_USER = "ban user",
+    UNBAN_USER = "unban user",
+    UPDATE_PARCEL = "update parcel",
+    DELETE_PARCEL = "delete parcel",
+    DELETE_TRACKING_EVENT = "delete tracking event",
 }

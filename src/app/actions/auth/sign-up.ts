@@ -17,8 +17,8 @@ export class SignUpAction {
         this.authService = authService;
     }
 
-    async execute(name: string, email: string, password: string) {
-        if (!name || !email || !password) {
+    async execute(username: string, email: string, password: string) {
+        if (!username || !email || !password) {
             throw new HttpException(401, "Missing fields");
         }
 
@@ -27,7 +27,11 @@ export class SignUpAction {
         }
 
         try {
-            return await this.authService.register({ name, email, password });
+            return await this.authService.register({
+                username,
+                email,
+                password,
+            });
         } catch (error) {
             throw new HttpException(401, "Registration failed");
         }

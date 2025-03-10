@@ -29,12 +29,12 @@ const refreshAuthOptions: RouteShorthandOptions = {
                                 type: "string",
                                 description: "Username of the user",
                             },
-                            userRole: {
+                            role: {
                                 type: "string",
                                 description: "Indicates user role",
                             },
                         },
-                        required: ["id", "username", "userRole"],
+                        required: ["id", "username", "role"],
                     },
                 },
                 required: ["accessToken", "user"],
@@ -62,7 +62,7 @@ const refreshAuthOptions: RouteShorthandOptions = {
     },
 };
 
-export const refreshAuth = {
+export const refresh = {
     url: "/auth/refresh",
     method: "PATCH" as const,
     schema: refreshAuthOptions.schema,
@@ -84,6 +84,8 @@ export const refreshAuth = {
 
                 request.server.requestContext.get("sessionData")
             );
+
+            console.log("end refresh", accessToken, refreshToken, user);
 
             return reply
                 .setCookie("x-session", refreshToken, {

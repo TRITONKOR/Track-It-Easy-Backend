@@ -16,31 +16,14 @@ export class JwtService {
         }
     }
 
-    /**
-     * Create an Access Token
-     * @param payload The object to encode in the token
-     * @param expiresIn Token expiration time (default is 15 minutes)
-     * @returns A string Access Token
-     */
     createAccessToken(payload: object, expiresIn = "15m"): string {
         return jwt.sign(payload, this.accessTokenSecret, { expiresIn });
     }
 
-    /**
-     * Create a Refresh Token
-     * @param payload The object to encode in the token
-     * @param expiresIn Token expiration time (default is 7 days)
-     * @returns A string Refresh Token
-     */
     createRefreshToken(payload: object, expiresIn = "7d"): string {
         return jwt.sign(payload, this.refreshTokenSecret, { expiresIn });
     }
 
-    /**
-     * Verify an Access Token
-     * @param token The Access Token to verify
-     * @returns The decoded token object, string or null if invalid
-     */
     verifyAccessToken(token: string): string | JwtPayload | null {
         try {
             return jwt.verify(token, this.accessTokenSecret);
@@ -50,11 +33,6 @@ export class JwtService {
         }
     }
 
-    /**
-     * Verify a Refresh Token
-     * @param token The Refresh Token to verify
-     * @returns The decoded token object, string or null if invalid
-     */
     verifyRefreshToken(token: string): string | JwtPayload | null {
         try {
             return jwt.verify(token, this.refreshTokenSecret);

@@ -1,12 +1,11 @@
 import { HttpException } from "src/api/errors/httpException";
 import { TrackingService } from "src/domain/services/tracking.service";
 
-export class TrackAction {
-    private trackService: TrackingService;
+export class GetParcelAction {
+    private trackingService: TrackingService;
 
-    constructor({ trackService }: { trackService: TrackingService }) {
-        console.log("constructor " + trackService);
-        this.trackService = trackService;
+    constructor({ trackingService }: { trackingService: TrackingService }) {
+        this.trackingService = trackingService;
     }
 
     async execute(courier: string, trackingNumber: string) {
@@ -18,8 +17,7 @@ export class TrackAction {
         }
 
         try {
-            console.log(this.trackService);
-            return await this.trackService.trackPackage(
+            return await this.trackingService.trackParcel(
                 courier,
                 trackingNumber
             );

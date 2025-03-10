@@ -1,68 +1,58 @@
-import { Repository } from "typeorm";
-import dataSource from "../../../config/data-source";
-import { User } from "../../entities/user.entity";
+import { eq } from "drizzle-orm";
+import { User } from "src/domain/entities/user.entity";
+import { db } from "../index";
+import { usersTable } from "../schema";
 
 export class UserRepository {
-    private repository: Repository<User>;
-
-    constructor() {
-        this.repository = dataSource.getRepository(User);
+    async findById(id: string) {
+        const users = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.id, id));
+        return users[0] || null;
     }
 
-    async findById(id: string): Promise<User | null> {
-        return await this.repository.findOne({ where: { id } });
+    async findByUsername(username: string): Promise<Partial<User> | null> {
+        const users = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.username, username));
+        return users[0] || null;
     }
 
-    async findByName(name: string): Promise<User | null> {
-        return await this.repository.findOne({ where: { name } });
-    }
-
-    async findAll(): Promise<User[]> {
-        return await this.repository.find();
+    async findAll(): Promise<Partial<User>[]> {
+        return await db.select().from(usersTable);
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        try {
-            const user = await this.repository.findOne({ where: { email } });
-            return user || null;
-        } catch (error) {
-            console.error("Error fetching user by email:", error);
-            throw new Error("Failed to find user by email");
-        }
+        const users = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.email, email));
+
+        if (!users.length) return null;
+
+        return new User(users[0]);
     }
 
-    async create(user: Partial<User>): Promise<User> {
-        if (!user.name || !user.email || !user.passwordHash) {
-            throw new Error("Invalid user data");
-        }
-        const newUser = this.repository.create(user);
-        try {
-            return await this.repository.save(newUser);
-        } catch (error) {
-            console.error("Error saving user:", error);
-            throw new Error("Failed to save user");
-        }
+    async create(user: typeof usersTable.$inferInsert): Promise<User> {
+        const [newUser] = await db.insert(usersTable).values(user).returning();
+        return new User(newUser);
     }
 
     async update(
         id: string,
-        updatedFields: Partial<User>
-    ): Promise<User | null> {
-        try {
-            await this.repository.update(id, updatedFields);
-            return await this.findById(id);
-        } catch (error) {
-            console.error("Error updating user:", error);
-            throw new Error("Failed to update user");
-        }
+        updatedFields: Partial<typeof usersTable.$inferInsert>
+    ): Promise<User> {
+        const [updatedUser] = await db
+            .update(usersTable)
+            .set({ ...updatedFields, updated_at: new Date() })
+            .where(eq(usersTable.id, id))
+            .returning();
+        return new User(updatedUser);
     }
 
     async delete(id: string): Promise<void> {
-        try {
-            await this.repository.delete(id);
-        } catch (error) {
-            console.error("Error deleting user:", error);
-            throw new Error("Failed to delete user");
-        }
+        await db.delete(usersTable).where(eq(usersTable.id, id));
     }
 }

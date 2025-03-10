@@ -1,7 +1,7 @@
 import { UserRepository } from "@db/repositories/user.repo";
 import bcrypt from "bcrypt";
 import { HttpException } from "src/api/errors/httpException";
-import { User } from "src/infra/entities/user.entity";
+import { User } from "src/domain/entities/user.entity";
 import { JwtService } from "./jwt.service";
 
 export class AuthService {
@@ -13,35 +13,36 @@ export class AuthService {
         this.jwtService = jwtService;
     }
 
-    /**
-     * Generate password hash.
-     * @param {string} password
-     * @returns {Promise<string>}
-     */
     async generatePasswordHash(password: string): Promise<string> {
         const saltRounds = 10;
         return bcrypt.hash(password, saltRounds);
     }
 
     async register(user: {
-        name: string;
+        username: string;
         email: string;
         password: string;
     }): Promise<User> {
-        const { name, email, password } = user;
+        const { username, email, password } = user;
         const passwordHash = await this.generatePasswordHash(password);
 
-        return await this.userRepository.create({
-            name,
+        const newUser = await this.userRepository.create({
+            id: crypto.randomUUID(),
+            username,
             email,
-            passwordHash,
+            password_hash: passwordHash,
+            role: "user",
+            created_at: new Date(),
+            updated_at: new Date(),
         });
+
+        return newUser;
     }
 
     async authenticateUser(
         email: string,
         password: string
-    ): Promise<Omit<User, "passwordHash"> | null> {
+    ): Promise<Omit<Partial<User>, "passwordHash"> | null> {
         const user = await this.userRepository.findByEmail(email);
         if (!user || !user.passwordHash) {
             return null;
@@ -55,7 +56,7 @@ export class AuthService {
         return userWithoutPasswordHash;
     }
 
-    async #authorizeUser(user: Omit<User, "passwordHash">) {
+    async #authorizeUser(user: Omit<Partial<User>, "passwordHash">) {
         const sessionId = require("crypto").randomBytes(6).toString("hex");
 
         const [accessToken, refreshToken] = await Promise.all([

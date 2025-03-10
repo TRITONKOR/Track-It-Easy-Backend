@@ -4,7 +4,7 @@ import { DomainContext } from "../../app/context";
 declare module "fastify" {
     interface FastifyRequest {
         user?: {
-            userId: string;
+            id: string;
             email: string;
         };
     }

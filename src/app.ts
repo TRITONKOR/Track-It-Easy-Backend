@@ -5,7 +5,7 @@ import Fastify, { FastifyInstance } from "fastify";
 import { patchContext } from "./api/context";
 import { patchRouting } from "./api/routes";
 import { config } from "./config/config";
-import authenticateToken from "./middleware/authMiddleware";
+import { authenticateToken } from "./middleware/authMiddleware";
 
 import fastifyCookie from "@fastify/cookie";
 import "reflect-metadata";
@@ -56,10 +56,18 @@ const bootstrapFastify = (): FastifyInstance => {
         prefix: "x-",
     });
 
-    fastify.register(authenticateToken);
-
     patchContext(fastify);
     patchRouting(fastify);
+
+    const publicRoutes = ["/auth/sign-in", "/auth/sign-up"];
+
+    fastify.addHook("preHandler", async (request, reply) => {
+        if (publicRoutes.includes(request.routerPath)) {
+            return;
+        }
+
+        await authenticateToken(request, reply);
+    });
 
     return fastify;
 };

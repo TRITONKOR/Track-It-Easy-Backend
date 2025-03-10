@@ -1,73 +1,78 @@
-import { Repository } from "typeorm";
-import dataSource from "../../../config/data-source";
-import { Parcel } from "../../entities/parcel.entity";
+import { parcelsTable, savedParcelsTable } from "@db/schema";
+import { eq } from "drizzle-orm";
+import { Parcel } from "../../../domain/entities/parcel.entity";
+import { db } from "../index";
 
 export class ParcelRepository {
-    private repository: Repository<Parcel>;
-
-    constructor() {
-        this.repository = dataSource.getRepository(Parcel);
-    }
-
     async findById(id: string): Promise<Parcel | null> {
-        return await this.repository.findOne({ where: { id } });
-    }
-
-    async findByTrackingNumber(trackingNumber: string): Promise<Parcel | null> {
-        return await this.repository.findOne({ where: { trackingNumber } });
+        const parcels = await db
+            .select()
+            .from(parcelsTable)
+            .where(eq(parcelsTable.id, id));
+        return new Parcel(parcels[0]) || null;
     }
 
     async findAll(): Promise<Parcel[]> {
-        return await this.repository.find();
+        const parcels = await db.select().from(parcelsTable);
+        return parcels.map((p) => new Parcel(p));
     }
 
-    async findByUserId(userId: string): Promise<Parcel | null> {
-        try {
-            const parcel = await this.repository.findOne({ where: { userId } });
-            return parcel || null;
-        } catch (error) {
-            console.error("Error fetching parcel by userId:", error);
-            throw new Error("Failed to find parcel by userId");
-        }
+    async findByTrackingNumber(trackingNumber: string): Promise<Parcel | null> {
+        const parcels = await db
+            .select()
+            .from(parcelsTable)
+            .where(eq(parcelsTable.trackingNumber, trackingNumber));
+        return new Parcel(parcels[0]) || null;
     }
 
-    async create(parcel: Partial<Parcel>): Promise<Parcel> {
-        if (
-            !parcel.trackingNumber ||
-            !parcel.userId ||
-            !parcel.statusId ||
-            !parcel.courierId
-        ) {
-            throw new Error("Invalid parcel data");
-        }
-        const newParcel = this.repository.create(parcel);
-        try {
-            return await this.repository.save(newParcel);
-        } catch (error) {
-            console.error("Error saving parcel:", error);
-            throw new Error("Failed to save parcel");
-        }
+    async findByUserId(userId: string): Promise<Parcel[]> {
+        const parcels = await db
+            .select({
+                id: parcelsTable.id,
+                trackingNumber: parcelsTable.trackingNumber,
+                courierId: parcelsTable.courierId,
+                statusId: parcelsTable.statusId,
+                status: parcelsTable.status,
+                createdAt: parcelsTable.createdAt,
+                updatedAt: parcelsTable.updatedAt,
+            })
+            .from(savedParcelsTable)
+            .innerJoin(
+                parcelsTable,
+                eq(savedParcelsTable.parcelId, parcelsTable.id)
+            )
+            .where(eq(savedParcelsTable.userId, userId));
+
+        return parcels.map((p) => new Parcel(p));
+    }
+
+    async saveParcelForUser(userId: string, parcelId: string): Promise<void> {
+        await db.insert(savedParcelsTable).values({ userId, parcelId });
+    }
+
+    async create(
+        parcel: typeof parcelsTable.$inferInsert
+    ): Promise<Parcel | null> {
+        const [newParcel] = await db
+            .insert(parcelsTable)
+            .values(parcel)
+            .returning();
+        return new Parcel(newParcel);
     }
 
     async update(
         id: string,
-        updatedFields: Partial<Parcel>
+        updatedFields: Partial<typeof parcelsTable.$inferInsert>
     ): Promise<Parcel | null> {
-        try {
-            await this.repository.update(id, updatedFields);
-            return await this.findById(id);
-        } catch (error) {
-            console.error("Error updating parcel:", error);
-            throw new Error("Failed to update parcel");
-        }
+        const [updatedParcel] = await db
+            .update(parcelsTable)
+            .set({ ...updatedFields, updatedAt: new Date() })
+            .where(eq(parcelsTable.id, id))
+            .returning();
+        return new Parcel(updatedParcel) || null;
     }
 
     async delete(id: string): Promise<void> {
-        try {
-            await this.repository.delete(id);
-        } catch (error) {
-            console.error("Error deleting parcel:", error);
-            throw new Error("Failed to delete parcel");
-        }
+        await db.delete(parcelsTable).where(eq(parcelsTable.id, id));
     }
 }

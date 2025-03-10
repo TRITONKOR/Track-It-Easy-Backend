@@ -5,7 +5,6 @@ export class NovaPoshtaAdapter {
 
     async getTrackingInfo(trackingNumber: string) {
         try {
-            console.log("Novaposhta");
             const response = await axios.get(
                 `${this.baseUrl}/mock/novaposhta/tracking/${trackingNumber}`
             );

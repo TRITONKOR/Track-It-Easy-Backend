@@ -57,7 +57,7 @@ export const signIn = {
 
             return reply
                 .code(400)
-                .send({ message: "Invalid username or password" });
+                .send({ message: "Invalid email or password" });
         }
     },
 };

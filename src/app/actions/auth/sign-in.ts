@@ -4,7 +4,7 @@ import { AuthService } from "src/domain/services/auth.service";
 export class SignInAction {
     private authService: AuthService;
 
-    constructor(authService: AuthService) {
+    constructor({ authService }: { authService: AuthService }) {
         this.authService = authService;
     }
 

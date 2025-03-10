@@ -4,7 +4,7 @@ import { AuthService } from "src/domain/services/auth.service";
 export class RefreshAction {
     private authService: AuthService;
 
-    constructor(authService: AuthService) {
+    constructor({ authService }: { authService: AuthService }) {
         this.authService = authService;
     }
 
@@ -17,6 +17,7 @@ export class RefreshAction {
         }
 
         try {
+            console.error("refreshToken", refreshToken);
             const sessionData = await this.authService.refreshTokensPair(
                 refreshToken
             );

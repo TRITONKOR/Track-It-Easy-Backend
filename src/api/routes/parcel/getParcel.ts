@@ -4,9 +4,9 @@ import {
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { TrackAction } from "src/app/actions/track/track";
+import { GetParcelAction } from "src/app/actions/parcel/getParcel";
 
-interface TrackRequest extends RequestGenericInterface {
+interface GetParcelRequest extends RequestGenericInterface {
     Body: {
         trackingNumber: string;
         courier: string;
@@ -26,17 +26,17 @@ const trackOptions: RouteShorthandOptions = {
     },
 };
 
-export const track = {
+export const getParcel = {
     url: "/track",
     method: "POST" as const,
     schema: trackOptions.schema,
     handler: async (
-        request: FastifyRequest<TrackRequest>,
+        request: FastifyRequest<GetParcelRequest>,
         reply: FastifyReply
     ) => {
         const { trackingNumber, courier } = request.body;
 
-        const result = await new TrackAction(
+        const result = await new GetParcelAction(
             request.server.domainContext
         ).execute(courier, trackingNumber);
 
