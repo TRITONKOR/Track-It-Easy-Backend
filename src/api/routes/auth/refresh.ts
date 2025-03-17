@@ -39,25 +39,6 @@ const refreshAuthOptions: RouteShorthandOptions = {
                 },
                 required: ["accessToken", "user"],
             },
-            401: {
-                type: "object",
-                properties: {
-                    message: {
-                        type: "string",
-                        description: "Error message if session is invalid",
-                    },
-                },
-            },
-            500: {
-                type: "object",
-                properties: {
-                    message: {
-                        type: "string",
-                        description:
-                            "Error message if something went wrong during the refresh",
-                    },
-                },
-            },
         },
     },
 };

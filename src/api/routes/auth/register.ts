@@ -4,9 +4,9 @@ import {
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { SignUpAction } from "src/app/actions/auth/sign-up";
+import { RegisterAction } from "src/app/actions/auth/register";
 
-interface SignUpRequest extends RequestGenericInterface {
+interface RegisterRequest extends RequestGenericInterface {
     Body: {
         username: string;
         email: string;
@@ -14,7 +14,7 @@ interface SignUpRequest extends RequestGenericInterface {
     };
 }
 
-const signUpOptions: RouteShorthandOptions = {
+const registerOptions: RouteShorthandOptions = {
     schema: {
         body: {
             type: "object",
@@ -28,17 +28,17 @@ const signUpOptions: RouteShorthandOptions = {
     },
 };
 
-export const signUp = {
-    url: "/auth/sign-up",
+export const register = {
+    url: "/auth/register",
     method: "POST" as const,
-    schema: signUpOptions.schema,
+    schema: registerOptions.schema,
     handler: async (
-        request: FastifyRequest<SignUpRequest>,
+        request: FastifyRequest<RegisterRequest>,
         reply: FastifyReply
     ) => {
         const { username, email, password } = request.body;
 
-        const result = await new SignUpAction(
+        const result = await new RegisterAction(
             request.server.domainContext
         ).execute(username, email, password);
 

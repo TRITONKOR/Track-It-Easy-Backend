@@ -1,7 +1,7 @@
 import { HttpException } from "src/api/errors/httpException";
 import { AuthService } from "src/domain/services/auth.service";
 
-export class SignInAction {
+export class LoginAction {
     private authService: AuthService;
 
     constructor({ authService }: { authService: AuthService }) {

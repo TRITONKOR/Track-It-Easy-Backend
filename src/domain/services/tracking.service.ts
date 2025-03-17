@@ -15,7 +15,7 @@ export class TrackingService {
 
     async trackParcel(courier: "nova" | "ukr", trackingNumber: string) {
         if (courier === "nova") {
-            return this.novaPoshtaAdapter.getTrackingInfo(trackingNumber);
+            return this.novaPoshtaAdapter.trackParcel(trackingNumber);
         } else if (courier === "ukr") {
             return this.ukrPoshtaAdapter.getTrackingInfo(trackingNumber);
         } else {

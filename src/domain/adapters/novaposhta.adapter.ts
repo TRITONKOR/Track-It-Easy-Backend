@@ -1,13 +1,29 @@
 import axios from "axios";
+import { config } from "../../config/config";
 
 export class NovaPoshtaAdapter {
-    private baseUrl = "http://localhost:3001";
+    private baseUrl: string;
+    private apiKey: string;
 
-    async getTrackingInfo(trackingNumber: string) {
+    constructor() {
+        this.baseUrl = config.NOVA_POSHTA_API_URL;
+        this.apiKey = config.NOVA_POSHTA_API_KEY;
+    }
+
+    async trackParcel(trackingNumber: string) {
         try {
-            const response = await axios.get(
-                `${this.baseUrl}/mock/novaposhta/tracking/${trackingNumber}`
-            );
+            const response = await axios.post(`${this.baseUrl}/v2.0/json/`, {
+                apiKey: this.apiKey,
+                modelName: "TrackingDocument",
+                calledMethod: "getStatusDocuments",
+                methodProperties: {
+                    Documents: [
+                        {
+                            DocumentNumber: trackingNumber,
+                        },
+                    ],
+                },
+            });
             return response.data;
         } catch (error) {
             console.error(

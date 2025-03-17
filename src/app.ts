@@ -59,7 +59,7 @@ const bootstrapFastify = (): FastifyInstance => {
     patchContext(fastify);
     patchRouting(fastify);
 
-    const publicRoutes = ["/auth/sign-in", "/auth/sign-up"];
+    const publicRoutes = ["/auth/login", "/auth/register"];
 
     fastify.addHook("preHandler", async (request, reply) => {
         if (publicRoutes.includes(request.routerPath)) {

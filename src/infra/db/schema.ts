@@ -30,7 +30,7 @@ export const usersTable = pgTable("users", {
 
 export const parcelsTable = pgTable("parcels", {
     id: uuid().primaryKey(),
-    trackingNumber: varchar({ length: 255 }).notNull(),
+    trackingNumber: varchar({ length: 255 }).notNull().unique(),
     courierId: uuid()
         .notNull()
         .references(() => couriersTable.id),
@@ -44,9 +44,9 @@ export const parcelsTable = pgTable("parcels", {
 
 export const trackingEventsTable = pgTable("tracking_events", {
     id: uuid().primaryKey(),
-    parcelId: uuid()
+    parcelTrackingNumber: varchar({ length: 255 })
         .notNull()
-        .references(() => parcelsTable.id),
+        .references(() => parcelsTable.trackingNumber),
     statusId: uuid()
         .notNull()
         .references(() => statusesTable.id),

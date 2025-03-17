@@ -17,10 +17,13 @@ export class GetParcelAction {
         }
 
         try {
-            return await this.trackingService.trackParcel(
+            const response = await this.trackingService.trackParcel(
                 courier,
                 trackingNumber
             );
+
+            console.log(response);
+            return response;
         } catch (error) {
             console.error(error);
             throw new HttpException(401, "Track package failed");
