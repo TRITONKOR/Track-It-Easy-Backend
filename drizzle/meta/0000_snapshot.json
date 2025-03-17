@@ -1,5 +1,5 @@
 {
-  "id": "a692b3df-352c-472e-898e-2317c72a6f1a",
+  "id": "224f623d-d4e1-42d6-88e2-9075282e9053",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -265,7 +265,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "parcels_trackingNumber_unique": {
+          "name": "parcels_trackingNumber_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "trackingNumber"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -274,12 +282,6 @@
       "name": "saved_parcels",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
         "userId": {
           "name": "userId",
           "type": "uuid",
@@ -383,9 +385,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "parcelId": {
-          "name": "parcelId",
-          "type": "uuid",
+        "parcelTrackingNumber": {
+          "name": "parcelTrackingNumber",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
@@ -431,15 +433,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "tracking_events_parcelId_parcels_id_fk": {
-          "name": "tracking_events_parcelId_parcels_id_fk",
+        "tracking_events_parcelTrackingNumber_parcels_trackingNumber_fk": {
+          "name": "tracking_events_parcelTrackingNumber_parcels_trackingNumber_fk",
           "tableFrom": "tracking_events",
           "tableTo": "parcels",
           "columnsFrom": [
-            "parcelId"
+            "parcelTrackingNumber"
           ],
           "columnsTo": [
-            "id"
+            "trackingNumber"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"

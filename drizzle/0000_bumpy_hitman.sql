@@ -33,11 +33,11 @@ CREATE TABLE "parcels" (
 	"statusId" uuid NOT NULL,
 	"status" varchar(255),
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
-	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "parcels_trackingNumber_unique" UNIQUE("trackingNumber")
 );
 --> statement-breakpoint
 CREATE TABLE "saved_parcels" (
-	"id" uuid PRIMARY KEY NOT NULL,
 	"userId" uuid NOT NULL,
 	"parcelId" uuid NOT NULL,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL
@@ -52,7 +52,7 @@ CREATE TABLE "statuses" (
 --> statement-breakpoint
 CREATE TABLE "tracking_events" (
 	"id" uuid PRIMARY KEY NOT NULL,
-	"parcelId" uuid NOT NULL,
+	"parcelTrackingNumber" varchar(255) NOT NULL,
 	"statusId" uuid NOT NULL,
 	"location" varchar(255) NOT NULL,
 	"isNotified" boolean DEFAULT false NOT NULL,
@@ -78,5 +78,5 @@ ALTER TABLE "parcels" ADD CONSTRAINT "parcels_courierId_couriers_id_fk" FOREIGN 
 ALTER TABLE "parcels" ADD CONSTRAINT "parcels_statusId_statuses_id_fk" FOREIGN KEY ("statusId") REFERENCES "public"."statuses"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "saved_parcels" ADD CONSTRAINT "saved_parcels_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "saved_parcels" ADD CONSTRAINT "saved_parcels_parcelId_parcels_id_fk" FOREIGN KEY ("parcelId") REFERENCES "public"."parcels"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tracking_events" ADD CONSTRAINT "tracking_events_parcelId_parcels_id_fk" FOREIGN KEY ("parcelId") REFERENCES "public"."parcels"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tracking_events" ADD CONSTRAINT "tracking_events_parcelTrackingNumber_parcels_trackingNumber_fk" FOREIGN KEY ("parcelTrackingNumber") REFERENCES "public"."parcels"("trackingNumber") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tracking_events" ADD CONSTRAINT "tracking_events_statusId_statuses_id_fk" FOREIGN KEY ("statusId") REFERENCES "public"."statuses"("id") ON DELETE no action ON UPDATE no action;

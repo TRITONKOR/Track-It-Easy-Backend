@@ -1,12 +1,12 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
+import { login } from "./login";
 import { refresh } from "./refresh";
-import { signIn } from "./sign-in";
-import { signUp } from "./sign-up";
+import { register } from "./register";
 
 export const authRouter: FastifyPluginAsync = async function (
     fastify: FastifyInstance
 ) {
-    fastify.route(signUp);
-    fastify.route(signIn);
+    fastify.route(register);
+    fastify.route(login);
     fastify.route(refresh);
 };

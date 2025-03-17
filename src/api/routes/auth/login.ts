@@ -5,16 +5,16 @@ import {
     RouteShorthandOptions,
 } from "fastify";
 
-import { SignInAction } from "src/app/actions/auth/sign-in";
+import { LoginAction } from "src/app/actions/auth/login";
 
-interface SignInRequest extends RequestGenericInterface {
+interface LoginRequest extends RequestGenericInterface {
     Body: {
         email: string;
         password: string;
     };
 }
 
-const signInOptions: RouteShorthandOptions = {
+const loginOptions: RouteShorthandOptions = {
     schema: {
         body: {
             type: "object",
@@ -27,18 +27,18 @@ const signInOptions: RouteShorthandOptions = {
     },
 };
 
-export const signIn = {
-    url: "/auth/sign-in",
+export const login = {
+    url: "/auth/login",
     method: "POST" as const,
-    schema: signInOptions.schema,
+    schema: loginOptions.schema,
     handler: async (
-        request: FastifyRequest<SignInRequest>,
+        request: FastifyRequest<LoginRequest>,
         reply: FastifyReply
     ) => {
         const { email, password } = request.body;
 
         try {
-            const result = await new SignInAction(
+            const result = await new LoginAction(
                 request.server.domainContext
             ).execute(email, password);
 

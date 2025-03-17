@@ -46,7 +46,7 @@ export class UserRepository {
     ): Promise<User> {
         const [updatedUser] = await db
             .update(usersTable)
-            .set({ ...updatedFields, updated_at: new Date() })
+            .set({ ...updatedFields, updatedAt: new Date() })
             .where(eq(usersTable.id, id))
             .returning();
         return new User(updatedUser);
