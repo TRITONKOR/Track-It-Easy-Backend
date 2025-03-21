@@ -4,12 +4,11 @@ import {
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { GetParcelAction } from "src/app/actions/parcel/getParcel";
+import { TrackParcelAction } from "src/app/actions/parcel/trackParcel";
 
 interface GetParcelRequest extends RequestGenericInterface {
     Body: {
         trackingNumber: string;
-        courier: string;
     };
 }
 
@@ -17,16 +16,15 @@ const trackOptions: RouteShorthandOptions = {
     schema: {
         body: {
             type: "object",
-            required: ["trackingNumber", "courier"],
+            required: ["trackingNumber"],
             properties: {
                 trackingNumber: { type: "string" },
-                courier: { type: "string" },
             },
         },
     },
 };
 
-export const getParcel = {
+export const trackParcel = {
     url: "/track",
     method: "POST" as const,
     schema: trackOptions.schema,
@@ -34,11 +32,11 @@ export const getParcel = {
         request: FastifyRequest<GetParcelRequest>,
         reply: FastifyReply
     ) => {
-        const { trackingNumber, courier } = request.body;
+        const { trackingNumber } = request.body;
 
-        const result = await new GetParcelAction(
+        const result = await new TrackParcelAction(
             request.server.domainContext
-        ).execute(courier, trackingNumber);
+        ).execute(trackingNumber);
 
         if (typeof result === "string") {
             return reply.code(400).send({ message: result });

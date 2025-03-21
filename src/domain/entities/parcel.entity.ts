@@ -7,6 +7,8 @@ export class Parcel {
     statusId: string;
     courierId: string;
     createdAt: Date;
+    fromLocation: string;
+    toLocation: string;
     updatedAt: Date;
 
     constructor(parcel: InferSelectModel<typeof parcelsTable>) {
@@ -14,6 +16,8 @@ export class Parcel {
         this.trackingNumber = parcel.trackingNumber;
         this.statusId = parcel.statusId;
         this.courierId = parcel.courierId;
+        this.fromLocation = parcel.fromLocation;
+        this.toLocation = parcel.toLocation;
         this.createdAt = parcel.createdAt;
         this.updatedAt = parcel.updatedAt;
     }

@@ -12,7 +12,7 @@ export class User {
 
     constructor(user: InferSelectModel<typeof usersTable>) {
         this.id = user.id;
-        this.username = user.name;
+        this.username = user.username;
         this.email = user.email;
         this.passwordHash = user.passwordHash;
         this.role = user.role;

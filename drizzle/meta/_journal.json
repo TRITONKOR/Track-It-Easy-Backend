@@ -8,6 +8,20 @@
       "when": 1742040702743,
       "tag": "0000_bumpy_hitman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1742490411215,
+      "tag": "0001_funny_thunderball",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1742499076304,
+      "tag": "0002_ancient_bloodscream",
+      "breakpoints": true
     }
   ]
 }

@@ -9,6 +9,9 @@ export class ParcelRepository {
             .select()
             .from(parcelsTable)
             .where(eq(parcelsTable.id, id));
+
+        if (!parcels.length) return null;
+
         return new Parcel(parcels[0]) || null;
     }
 
@@ -22,6 +25,9 @@ export class ParcelRepository {
             .select()
             .from(parcelsTable)
             .where(eq(parcelsTable.trackingNumber, trackingNumber));
+
+        if (!parcels.length) return null;
+
         return new Parcel(parcels[0]) || null;
     }
 
@@ -33,6 +39,8 @@ export class ParcelRepository {
                 courierId: parcelsTable.courierId,
                 statusId: parcelsTable.statusId,
                 status: parcelsTable.status,
+                fromLocation: parcelsTable.fromLocation,
+                toLocation: parcelsTable.toLocation,
                 createdAt: parcelsTable.createdAt,
                 updatedAt: parcelsTable.updatedAt,
             })
@@ -42,6 +50,8 @@ export class ParcelRepository {
                 eq(savedParcelsTable.parcelId, parcelsTable.id)
             )
             .where(eq(savedParcelsTable.userId, userId));
+
+        if (!parcels.length) return [];
 
         return parcels.map((p) => new Parcel(p));
     }
@@ -57,6 +67,9 @@ export class ParcelRepository {
             .insert(parcelsTable)
             .values(parcel)
             .returning();
+
+        if (!newParcel) return null;
+
         return new Parcel(newParcel);
     }
 
@@ -69,6 +82,9 @@ export class ParcelRepository {
             .set({ ...updatedFields, updatedAt: new Date() })
             .where(eq(parcelsTable.id, id))
             .returning();
+
+        if (!updatedParcel) return null;
+
         return new Parcel(updatedParcel) || null;
     }
 
