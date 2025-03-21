@@ -1,10 +1,10 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
-import { getParcel } from "./getParcel";
 import { getSavedParcels } from "./getSavedParcels";
+import { trackParcel } from "./trackParcel";
 
 export const parcelRouter: FastifyPluginAsync = async function (
     fastify: FastifyInstance
 ) {
-    fastify.route(getParcel);
+    fastify.route(trackParcel);
     fastify.route(getSavedParcels);
 };

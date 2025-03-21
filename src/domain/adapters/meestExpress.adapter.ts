@@ -1,9 +1,10 @@
 import axios from "axios";
+import { ICourierAdapter } from "../services/tracking.service";
 
-export class UkrPoshtaAdapter {
+export class MeestExpressAdapter implements ICourierAdapter {
     private baseUrl = "http://localhost:3001";
 
-    async getTrackingInfo(trackingNumber: string) {
+    async trackParcel(trackingNumber: string) {
         try {
             const response = await axios.get(
                 `${this.baseUrl}/mock/ukrposhta/tracking/${trackingNumber}`

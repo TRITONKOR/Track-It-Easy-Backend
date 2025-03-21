@@ -30,10 +30,10 @@ export class AuthService {
             id: crypto.randomUUID(),
             username,
             email,
-            password_hash: passwordHash,
+            passwordHash: passwordHash,
             role: "user",
-            created_at: new Date(),
-            updated_at: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
         });
 
         return newUser;

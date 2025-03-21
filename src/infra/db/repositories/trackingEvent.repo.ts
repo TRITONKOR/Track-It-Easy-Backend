@@ -17,15 +17,11 @@ export class TrackingEventRepository {
         return trackingEvents.map((t) => new TrackingEvent(t));
     }
 
-    async findAllByTrackingNumber(
-        trackingNumber: string
-    ): Promise<TrackingEvent[] | null> {
+    async findAllByParcelId(parcelId: string): Promise<TrackingEvent[] | null> {
         const trackingEvents = await db
             .select()
             .from(trackingEventsTable)
-            .where(
-                eq(trackingEventsTable.parcelTrackingNumber, trackingNumber)
-            );
+            .where(eq(trackingEventsTable.parcelId, parcelId));
         return trackingEvents.length
             ? trackingEvents.map((te) => new TrackingEvent(te))
             : null;

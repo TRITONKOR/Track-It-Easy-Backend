@@ -13,6 +13,10 @@ export const notificationTypeEnum = pgEnum("notification_type", [
     "email",
     "push",
 ]);
+export const courierEnum = pgEnum("courierName", [
+    "NovaPoshta",
+    "MeestExpress",
+]);
 export const actionTypeEnum = pgEnum(
     "action_type",
     Object.values(ActionType) as [string, ...string[]]
@@ -38,15 +42,17 @@ export const parcelsTable = pgTable("parcels", {
         .notNull()
         .references(() => statusesTable.id),
     status: varchar({ length: 255 }),
+    fromLocation: varchar({ length: 255 }).notNull(),
+    toLocation: varchar({ length: 255 }).notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 });
 
 export const trackingEventsTable = pgTable("tracking_events", {
     id: uuid().primaryKey(),
-    parcelTrackingNumber: varchar({ length: 255 })
+    parcelId: uuid()
         .notNull()
-        .references(() => parcelsTable.trackingNumber),
+        .references(() => parcelsTable.id),
     statusId: uuid()
         .notNull()
         .references(() => statusesTable.id),
@@ -59,7 +65,7 @@ export const trackingEventsTable = pgTable("tracking_events", {
 
 export const couriersTable = pgTable("couriers", {
     id: uuid().primaryKey(),
-    name: varchar({ length: 255 }).notNull(),
+    name: courierEnum().notNull(),
     api: varchar({ length: 255 }).notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true }).defaultNow().notNull(),

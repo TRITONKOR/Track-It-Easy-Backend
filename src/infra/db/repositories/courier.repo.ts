@@ -12,6 +12,16 @@ export class CourierRepository {
         return new Courier(couriers[0]) || null;
     }
 
+    async findByName(name: string): Promise<Courier | null> {
+        const couriers = await db
+            .select()
+            .from(couriersTable)
+            .where(
+                eq(couriersTable.name, name as "NovaPoshta" | "MeestExpress")
+            );
+        return new Courier(couriers[0]) || null;
+    }
+
     async findAll(): Promise<Courier[] | null> {
         const couriers = await db.select().from(couriersTable);
         return couriers.map((courier) => new Courier(courier));
