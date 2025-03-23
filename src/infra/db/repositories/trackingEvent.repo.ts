@@ -22,9 +22,10 @@ export class TrackingEventRepository {
             .select()
             .from(trackingEventsTable)
             .where(eq(trackingEventsTable.parcelId, parcelId));
+
         return trackingEvents.length
             ? trackingEvents.map((te) => new TrackingEvent(te))
-            : null;
+            : [];
     }
 
     async create(
@@ -34,6 +35,9 @@ export class TrackingEventRepository {
             .insert(trackingEventsTable)
             .values(parcel)
             .returning();
+
+        if (!newTrackingEvent) return null;
+
         return new TrackingEvent(newTrackingEvent);
     }
 

@@ -6,9 +6,9 @@ export class Parcel {
     trackingNumber: string;
     statusId: string;
     courierId: string;
-    createdAt: Date;
     fromLocation: string;
     toLocation: string;
+    createdAt: Date;
     updatedAt: Date;
 
     constructor(parcel: InferSelectModel<typeof parcelsTable>) {

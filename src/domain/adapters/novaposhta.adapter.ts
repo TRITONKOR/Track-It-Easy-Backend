@@ -25,26 +25,62 @@ export class NovaPoshtaAdapter implements ICourierAdapter {
         return statusMap[apiStatus] || "Очікується";
     }
 
+    private async fetchGeneralTrackingInfo(trackingNumber: string) {
+        const response = await axios.post(`${this.baseUrl}/v2.0/json/`, {
+            apiKey: this.apiKey,
+            modelName: "TrackingDocumentGeneral",
+            calledMethod: "getStatusDocuments",
+            methodProperties: {
+                Documents: [
+                    {
+                        DocumentNumber: trackingNumber,
+                        Phone: "",
+                    },
+                ],
+            },
+        });
+
+        return response.data?.data?.[0];
+    }
+
+    private async fetchMovementHistory(trackingNumber: string) {
+        const response = await axios.post(`${this.baseUrl}/v2.0/json/`, {
+            apiKey: this.apiKey,
+            modelName: "InternetDocument",
+            calledMethod: "getDocumentsEWMovement",
+            methodProperties: {
+                Number: trackingNumber,
+                NewFormat: "1",
+            },
+        });
+
+        const movementData = response.data?.data?.[0]?.movement;
+        if (!movementData) {
+            return [];
+        }
+
+        const mapEvent = (event: any) => ({
+            statusLocation: event.StatusLocation,
+            description: event.EventDescription,
+            timestamp:
+                event.ArrivalTime || event.DepartureTime || event.Date || "N/A",
+        });
+
+        return [
+            ...(movementData.passed || []),
+            ...(movementData.now || []),
+            ...(movementData.future || []),
+        ].map(mapEvent);
+    }
+
     async trackParcel(trackingNumber: string): Promise<ITrackingResponse> {
         try {
-            const response = await axios.post(`${this.baseUrl}/v2.0/json/`, {
-                apiKey: this.apiKey,
-                modelName: "TrackingDocumentGeneral",
-                calledMethod: "getStatusDocuments",
-                methodProperties: {
-                    Documents: [
-                        {
-                            DocumentNumber: trackingNumber,
-                            Phone: "",
-                        },
-                    ],
-                },
-            });
-
-            const parcelData = response.data?.data?.[0];
+            const [parcelData, movementHistory] = await Promise.all([
+                this.fetchGeneralTrackingInfo(trackingNumber),
+                this.fetchMovementHistory(trackingNumber),
+            ]);
 
             if (!parcelData) {
-                console.log("dgdfgdfgfdgfdd");
                 return { success: false, error: "Tracking info not found" };
             }
 
@@ -55,6 +91,7 @@ export class NovaPoshtaAdapter implements ICourierAdapter {
                     status: this.mapStatus(parcelData.Status),
                     fromLocation: parcelData.WarehouseSenderAddress,
                     toLocation: parcelData.WarehouseRecipientAddress,
+                    movementHistory,
                 },
             };
         } catch (error) {

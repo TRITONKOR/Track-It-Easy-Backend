@@ -53,10 +53,7 @@ export const trackingEventsTable = pgTable("tracking_events", {
     parcelId: uuid()
         .notNull()
         .references(() => parcelsTable.id),
-    statusId: uuid()
-        .notNull()
-        .references(() => statusesTable.id),
-    location: varchar({ length: 255 }).notNull(),
+    statusLocation: varchar({ length: 255 }).notNull(),
     isNotified: boolean().default(false).notNull(),
     rawStatus: varchar({ length: 255 }).notNull(),
     timestamp: timestamp({ withTimezone: true }).defaultNow().notNull(),
