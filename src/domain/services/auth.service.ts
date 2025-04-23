@@ -85,7 +85,7 @@ export class AuthService {
         refreshToken: string
     ): Promise<{ accessToken: string; refreshToken: string; user: any }> {
         if (!refreshToken) {
-            throw new HttpException(401, "Invalid token provided");
+            throw new HttpException(403, "Invalid token provided");
         }
 
         const payload = this.jwtService.verifyRefreshToken(refreshToken);
@@ -100,15 +100,15 @@ export class AuthService {
             throw new HttpException(404, "User not found");
         }
 
-        const newAccessToken = this.jwtService.createAccessToken(
-            { userId: user.id, userRole: user.role },
-            "15m"
-        );
+        const newAccessToken = this.jwtService.createAccessToken({
+            userId: user.id,
+            userRole: user.role,
+        });
 
-        const newRefreshToken = this.jwtService.createRefreshToken(
-            { userId: user.id, sessionId: payload.sessionId },
-            "7d"
-        );
+        const newRefreshToken = this.jwtService.createRefreshToken({
+            userId: user.id,
+            sessionId: payload.sessionId,
+        });
 
         return {
             accessToken: newAccessToken,

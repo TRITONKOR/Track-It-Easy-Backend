@@ -49,7 +49,14 @@ export const login = {
             const { accessToken, refreshToken, user } = result;
 
             return reply
-                .setCookie("x-session", refreshToken, { maxAge: 3600 * 24 * 7 })
+                .setCookie("x-session", refreshToken, {
+                    maxAge: 3600 * 24 * 7,
+                    secure: false,
+                    httpOnly: true,
+                    priority: "high",
+                    sameSite: "lax",
+                    path: "/",
+                })
                 .code(201)
                 .send({ accessToken, user });
         } catch (error) {

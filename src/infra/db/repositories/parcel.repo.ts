@@ -1,5 +1,5 @@
-import { parcelsTable, savedParcelsTable } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { followedParcelsTable, parcelsTable } from "@db/schema";
+import { and, eq } from "drizzle-orm";
 import { Parcel } from "../../../domain/entities/parcel.entity";
 import { db } from "../index";
 
@@ -41,23 +41,76 @@ export class ParcelRepository {
                 status: parcelsTable.status,
                 fromLocation: parcelsTable.fromLocation,
                 toLocation: parcelsTable.toLocation,
+                isFollowed: parcelsTable.isFollowed,
                 createdAt: parcelsTable.createdAt,
                 updatedAt: parcelsTable.updatedAt,
             })
-            .from(savedParcelsTable)
+            .from(followedParcelsTable)
             .innerJoin(
                 parcelsTable,
-                eq(savedParcelsTable.parcelId, parcelsTable.id)
+                eq(followedParcelsTable.parcelId, parcelsTable.id)
             )
-            .where(eq(savedParcelsTable.userId, userId));
+            .where(eq(followedParcelsTable.userId, userId));
 
         if (!parcels.length) return [];
 
         return parcels.map((p) => new Parcel(p));
     }
 
-    async saveParcelForUser(userId: string, parcelId: string): Promise<void> {
-        await db.insert(savedParcelsTable).values({ userId, parcelId });
+    async isParcelFollowedByUserId(
+        userId: string,
+        parcelId: string
+    ): Promise<boolean> {
+        const parcels = await db
+            .select()
+            .from(followedParcelsTable)
+            .innerJoin(
+                parcelsTable,
+                eq(followedParcelsTable.parcelId, parcelsTable.id)
+            )
+            .where(
+                and(
+                    eq(followedParcelsTable.userId, userId),
+                    eq(followedParcelsTable.parcelId, parcelId)
+                )
+            );
+        return parcels.length > 0;
+    }
+
+    async followParcel(userId: string, parcelId: string): Promise<void> {
+        if (await this.isParcelFollowed(userId, parcelId)) {
+            throw new Error("Parcel already followed");
+        }
+
+        await db.insert(followedParcelsTable).values({
+            id: crypto.randomUUID(),
+            userId,
+            parcelId,
+        });
+    }
+
+    async isParcelFollowed(userId: string, parcelId: string): Promise<boolean> {
+        const followedParcels = await db
+            .select()
+            .from(followedParcelsTable)
+            .where(
+                and(
+                    eq(followedParcelsTable.userId, userId),
+                    eq(followedParcelsTable.parcelId, parcelId)
+                )
+            );
+        return followedParcels.length > 0;
+    }
+
+    async unfollowParcel(userId: string, parcelId: string): Promise<void> {
+        await db
+            .delete(followedParcelsTable)
+            .where(
+                and(
+                    eq(followedParcelsTable.userId, userId),
+                    eq(followedParcelsTable.parcelId, parcelId)
+                )
+            );
     }
 
     async create(

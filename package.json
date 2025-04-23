@@ -13,8 +13,9 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
-        "@fastify/cookie": "^8.2.0",
-        "@fastify/request-context": "^4.2.0",
+        "@fastify/cookie": "^11.0.2",
+        "@fastify/cors": "^11.0.0",
+        "@fastify/request-context": "^6.1.0",
         "@mgcrea/fastify-request-logger": "^1.9.0",
         "@mgcrea/pino-pretty-compact": "^1.4.2",
         "axios": "^1.7.9",
@@ -22,7 +23,7 @@
         "bcryptjs": "^2.4.3",
         "dotenv": "^16.4.7",
         "drizzle-orm": "^0.39.1",
-        "fastify": "^4.29.0",
+        "fastify": "^5.2.1",
         "jsonwebtoken": "^9.0.2",
         "pg": "^8.13.1",
         "reflect-metadata": "^0.2.2"

@@ -29,6 +29,27 @@
       "when": 1742750514299,
       "tag": "0003_shiny_captain_midlands",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1743341020250,
+      "tag": "0004_wet_jetstream",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1744919263229,
+      "tag": "0005_fixed_wind_dancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1744920074027,
+      "tag": "0006_aromatic_psynapse",
+      "breakpoints": true
     }
   ]
 }

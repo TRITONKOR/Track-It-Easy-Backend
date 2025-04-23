@@ -21,8 +21,10 @@ export interface ITrackingResponse {
     data?: {
         trackingNumber: string;
         status: string;
+        factualWeight: number;
         fromLocation?: string;
         toLocation?: string;
+        isFollowed?: boolean;
         movementHistory?: IMovementEvent[];
     };
     error?: string;
@@ -31,7 +33,9 @@ export interface ITrackingResponse {
 export class TrackingService {
     private adapters: Map<
         string,
-        { trackParcel: (trackingNumber: string) => Promise<any> }
+        {
+            trackParcel: (trackingNumber: string) => Promise<any>;
+        }
     >;
     private parcelRepository;
     private courierService;
@@ -56,7 +60,7 @@ export class TrackingService {
         ]);
     }
 
-    async trackParcel(trackingNumber: string) {
+    async trackParcel(trackingNumber: string, userId?: string) {
         let parcel = await this.parcelRepository.findByTrackingNumber(
             trackingNumber
         );
@@ -75,6 +79,14 @@ export class TrackingService {
                         .trackParcel(trackingNumber);
 
                     if (result.success && result.data) {
+                        if (userId) {
+                            result.data.isFollowed =
+                                await this.parcelRepository.isParcelFollowedByUserId(
+                                    userId,
+                                    trackingNumber
+                                );
+                        }
+
                         const trackingEventsFromRequest =
                             result.data.movementHistory?.map(
                                 (event: IMovementEvent) =>
@@ -107,6 +119,7 @@ export class TrackingService {
                 const result = await adapter.trackParcel(trackingNumber);
 
                 if (result?.success && result.data) {
+                    result.data.isFollowed = false;
                     const parcelData = result.data;
 
                     const newParcel = {

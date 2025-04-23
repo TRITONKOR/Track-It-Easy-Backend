@@ -1,0 +1,1 @@
+ALTER TABLE "followed_parcels" ADD COLUMN "id" uuid PRIMARY KEY NOT NULL;
