@@ -1,3 +1,4 @@
+import cors from "@fastify/cors";
 import fastifyRequestContext from "@fastify/request-context";
 import fastifyRequestLogger from "@mgcrea/fastify-request-logger";
 import Fastify, { FastifyInstance } from "fastify";
@@ -48,21 +49,30 @@ const bootstrapFastify = (): FastifyInstance => {
     fastify.register(fastifyCookie, {
         secret: config.COOKIE_SECRET,
         parseOptions: {
-            secure: true,
+            secure: false,
             httpOnly: true,
             priority: "high",
-            sameSite: "strict",
+            sameSite: "lax",
+            path: "/",
         },
         prefix: "x-",
+    });
+
+    fastify.register(cors, {
+        origin: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
     });
 
     patchContext(fastify);
     patchRouting(fastify);
 
-    const publicRoutes = ["/auth/login", "/auth/register"];
+    const publicRoutes = ["/auth/login", "/auth/register", "/auth/refresh"];
 
     fastify.addHook("preHandler", async (request, reply) => {
-        if (publicRoutes.includes(request.routerPath)) {
+        const routePath = request.routeOptions.url ?? "";
+        if (publicRoutes.includes(routePath)) {
             return;
         }
 

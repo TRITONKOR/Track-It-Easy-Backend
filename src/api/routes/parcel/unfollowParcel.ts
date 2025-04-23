@@ -4,20 +4,20 @@ import {
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { TrackParcelAction } from "src/app/actions/parcel/trackParcel";
+import { UnfollowParcelAction } from "src/app/actions/parcel/unfollowParcel";
 
-interface TrackParcelRequest extends RequestGenericInterface {
+interface UnfollowParcelRequest extends RequestGenericInterface {
     Body: {
         trackingNumber: string;
-        userId?: string;
+        userId: string;
     };
 }
 
-const trackOptions: RouteShorthandOptions = {
+const unfollowParcelOptions: RouteShorthandOptions = {
     schema: {
         body: {
             type: "object",
-            required: ["trackingNumber"],
+            required: ["trackingNumber", "userId"],
             properties: {
                 trackingNumber: { type: "string" },
                 userId: { type: "string" },
@@ -26,23 +26,24 @@ const trackOptions: RouteShorthandOptions = {
     },
 };
 
-export const trackParcel = {
-    url: "/track",
+export const unfollowParcel = {
+    url: "/unfollow-parcel",
     method: "POST" as const,
-    schema: trackOptions.schema,
+    schema: unfollowParcelOptions.schema,
     handler: async (
-        request: FastifyRequest<TrackParcelRequest>,
+        request: FastifyRequest<UnfollowParcelRequest>,
         reply: FastifyReply
     ) => {
         const { trackingNumber, userId } = request.body;
 
-        const result = await new TrackParcelAction(
+        const result = await new UnfollowParcelAction(
             request.server.domainContext
         ).execute(trackingNumber, userId);
 
         if (typeof result === "string") {
             return reply.code(400).send({ message: result });
         }
+
         return reply.code(201).send(result);
     },
 };

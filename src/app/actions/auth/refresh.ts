@@ -13,17 +13,18 @@ export class RefreshAction {
         _sessionData?: Record<string, unknown>
     ) {
         if (!refreshToken) {
-            throw new HttpException(401, "Invalid token are provided");
+            throw new HttpException(403, "Invalid token are provided");
         }
 
         try {
-            console.error("refreshToken", refreshToken);
+            console.log("refreshToken", refreshToken);
             const sessionData = await this.authService.refreshTokensPair(
                 refreshToken
             );
 
             return sessionData;
         } catch (error) {
+            console.error(error);
             const errorMessage =
                 error instanceof Error ? error.message : "Unknown error";
             throw new HttpException(401, errorMessage);

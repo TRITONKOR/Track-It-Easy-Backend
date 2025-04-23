@@ -8,14 +8,15 @@ export class TrackParcelAction {
         this.trackingService = trackingService;
     }
 
-    async execute(trackingNumber: string) {
+    async execute(trackingNumber: string, userId?: string) {
         if (!trackingNumber) {
             throw new HttpException(401, "Missing field");
         }
 
         try {
             const response = await this.trackingService.trackParcel(
-                trackingNumber
+                trackingNumber,
+                userId
             );
 
             return response;

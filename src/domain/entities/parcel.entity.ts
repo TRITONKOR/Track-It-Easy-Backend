@@ -8,6 +8,7 @@ export class Parcel {
     courierId: string;
     fromLocation: string;
     toLocation: string;
+    isFollowed: boolean;
     createdAt: Date;
     updatedAt: Date;
 
@@ -18,6 +19,7 @@ export class Parcel {
         this.courierId = parcel.courierId;
         this.fromLocation = parcel.fromLocation;
         this.toLocation = parcel.toLocation;
+        this.isFollowed = parcel.isFollowed;
         this.createdAt = parcel.createdAt;
         this.updatedAt = parcel.updatedAt;
     }

@@ -25,7 +25,7 @@ export const actionTypeEnum = pgEnum(
 export const usersTable = pgTable("users", {
     id: uuid().primaryKey(),
     username: varchar({ length: 255 }).notNull(),
-    email: varchar({ length: 255 }).notNull(),
+    email: varchar({ length: 255 }).notNull().unique(),
     passwordHash: varchar({ length: 255 }).notNull(),
     role: userRoleEnum().default("user").notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
@@ -44,6 +44,7 @@ export const parcelsTable = pgTable("parcels", {
     status: varchar({ length: 255 }),
     fromLocation: varchar({ length: 255 }).notNull(),
     toLocation: varchar({ length: 255 }).notNull(),
+    isFollowed: boolean().default(false).notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 });
@@ -52,7 +53,7 @@ export const trackingEventsTable = pgTable("tracking_events", {
     id: uuid().primaryKey(),
     parcelId: uuid()
         .notNull()
-        .references(() => parcelsTable.id),
+        .references(() => parcelsTable.id, { onDelete: "cascade" }),
     statusLocation: varchar({ length: 255 }).notNull(),
     isNotified: boolean().default(false).notNull(),
     rawStatus: varchar({ length: 255 }).notNull(),
@@ -79,10 +80,10 @@ export const notificationsTable = pgTable("notifications", {
     id: uuid().primaryKey(),
     parcelId: uuid()
         .notNull()
-        .references(() => parcelsTable.id),
+        .references(() => parcelsTable.id, { onDelete: "cascade" }),
     userId: uuid()
         .notNull()
-        .references(() => usersTable.id),
+        .references(() => usersTable.id, { onDelete: "cascade" }),
     message: varchar({ length: 255 }).notNull(),
     type: notificationTypeEnum().notNull(),
     sentAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
@@ -98,10 +99,11 @@ export const adminActionsTable = pgTable("admin_actions", {
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 });
 
-export const savedParcelsTable = pgTable("saved_parcels", {
+export const followedParcelsTable = pgTable("followed_parcels", {
+    id: uuid().primaryKey(),
     userId: uuid()
         .notNull()
-        .references(() => usersTable.id, { onDelete: "cascade" }),
+        .references(() => usersTable.id),
     parcelId: uuid()
         .notNull()
         .references(() => parcelsTable.id, { onDelete: "cascade" }),

@@ -1,9 +1,4 @@
-import {
-    FastifyReply,
-    FastifyRequest,
-    RequestGenericInterface,
-    RouteShorthandOptions,
-} from "fastify";
+import { FastifyReply, FastifyRequest, RequestGenericInterface } from "fastify";
 import { RefreshAction } from "../../../app/actions/auth/refresh";
 import { HttpException } from "../../errors/httpException";
 
@@ -11,42 +6,9 @@ interface RefreshAuthRequest extends RequestGenericInterface {
     Body: {};
 }
 
-const refreshAuthOptions: RouteShorthandOptions = {
-    schema: {
-        response: {
-            200: {
-                type: "object",
-                properties: {
-                    accessToken: {
-                        type: "string",
-                        description: "New access token",
-                    },
-                    user: {
-                        type: "object",
-                        properties: {
-                            id: { type: "string", description: "User ID" },
-                            username: {
-                                type: "string",
-                                description: "Username of the user",
-                            },
-                            role: {
-                                type: "string",
-                                description: "Indicates user role",
-                            },
-                        },
-                        required: ["id", "username", "role"],
-                    },
-                },
-                required: ["accessToken", "user"],
-            },
-        },
-    },
-};
-
 export const refresh = {
     url: "/auth/refresh",
     method: "PATCH" as const,
-    schema: refreshAuthOptions.schema,
     handler: async (
         request: FastifyRequest<RefreshAuthRequest>,
         reply: FastifyReply
@@ -54,7 +16,7 @@ export const refresh = {
         const _refreshToken = request.cookies["x-session"];
 
         if (!_refreshToken) {
-            throw new HttpException(401, "Invalid session");
+            throw new HttpException(401, "No Refresh token provided");
         }
 
         try {
@@ -66,12 +28,9 @@ export const refresh = {
                 request.server.requestContext.get("sessionData")
             );
 
-            console.log("end refresh", accessToken, refreshToken, user);
-
             return reply
                 .setCookie("x-session", refreshToken, {
                     maxAge: 3600 * 24 * 7,
-                    signed: true,
                     secure: true,
                     httpOnly: true,
                     path: "/",

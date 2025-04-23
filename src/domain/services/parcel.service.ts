@@ -51,11 +51,50 @@ export class ParcelService {
         }
     }
 
-    async saveParcelForUser(userId: string, parcelId: string): Promise<void> {
+    async isParcelFollowedByUserId(
+        userId: string,
+        trackingNumber: string
+    ): Promise<boolean> {
         try {
-            await this.parcelRepository.saveParcelForUser(userId, parcelId);
+            const parcel = await this.parcelRepository.findByTrackingNumber(
+                trackingNumber
+            );
+            if (!parcel) {
+                throw new HttpException(
+                    404,
+                    "Parcel not found with the provided tracking number"
+                );
+            }
+            const isFollowed =
+                await this.parcelRepository.isParcelFollowedByUserId(
+                    userId,
+                    parcel.getId()
+                );
+            return isFollowed;
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error;
+            }
+            throw new HttpException(
+                500,
+                "Error checking if parcel is followed by user"
+            );
+        }
+    }
+
+    async followParcel(userId: string, parcelId: string): Promise<void> {
+        try {
+            await this.parcelRepository.followParcel(userId, parcelId);
         } catch (error) {
             throw new HttpException(500, "Error saving parcel for user");
+        }
+    }
+
+    async unfollowParcel(userId: string, parcelId: string): Promise<void> {
+        try {
+            await this.parcelRepository.unfollowParcel(userId, parcelId);
+        } catch (error) {
+            throw new HttpException(500, "Error removing parcel for user");
         }
     }
 

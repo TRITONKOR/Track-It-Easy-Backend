@@ -21,7 +21,7 @@ export const authenticateToken = async (
     try {
         const decoded = jwtService.verifyAccessToken(token);
         if (!decoded || typeof decoded === "string") {
-            return reply.status(403).send({ message: "Invalid token" });
+            return reply.status(401).send({ message: "Invalid token" });
         }
 
         const user = await userRepository.findById(decoded.userId);
@@ -30,11 +30,11 @@ export const authenticateToken = async (
         }
 
         request.user = {
-            userId: user.id,
+            id: user.id,
             email: user.email,
         };
     } catch (err) {
         request.log.error(err, "Authentication error");
-        return reply.status(403).send({ message: "Invalid token" });
+        return reply.status(401).send({ message: "Invalid token" });
     }
 };
