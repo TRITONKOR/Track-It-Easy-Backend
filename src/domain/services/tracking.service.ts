@@ -1,6 +1,8 @@
 import { ParcelRepository } from "@db/repositories/parcel.repo";
+import EventEmitter from "events";
 import { MeestExpressAdapter } from "../adapters/meestExpress.adapter";
 import { NovaPoshtaAdapter } from "../adapters/novaposhta.adapter";
+import { Parcel } from "../entities/parcel.entity";
 import { TrackingEvent } from "../entities/trackingEvent.entity";
 import { CourierService } from "./courier.service";
 import { StatusService } from "./status.service";
@@ -21,11 +23,12 @@ export interface ITrackingResponse {
     data?: {
         trackingNumber: string;
         status: string;
-        factualWeight: number;
+        factualWeight: string;
         fromLocation?: string;
         toLocation?: string;
         isFollowed?: boolean;
         movementHistory?: IMovementEvent[];
+        lastUpdated?: string;
     };
     error?: string;
 }
@@ -41,6 +44,17 @@ export class TrackingService {
     private courierService;
     private statusService;
     private trackingEventService;
+    private updateInterval: number;
+    private eventEmitter: EventEmitter;
+    private updateInProgress: boolean;
+    private updateTimeout?: NodeJS.Timeout;
+
+    private readonly FINAL_STATUSES = [
+        "Доставлено",
+        "Повернуто",
+        "Втрачено",
+        "Скасовано",
+    ];
 
     constructor(
         parcelRepository: ParcelRepository,
@@ -48,101 +62,266 @@ export class TrackingService {
         statusService: StatusService,
         trackingEventService: TrackingEventService,
         novaPoshtaAdapter: NovaPoshtaAdapter,
-        meestExpressAdapter: MeestExpressAdapter
+        meestExpressAdapter: MeestExpressAdapter,
+        updateIntervalMs: number = 60000
     ) {
         this.parcelRepository = parcelRepository;
         this.courierService = courierService;
         this.statusService = statusService;
         this.trackingEventService = trackingEventService;
+        this.updateInterval = updateIntervalMs;
+        this.eventEmitter = new EventEmitter();
+        this.updateInProgress = false;
+
         this.adapters = new Map<string, ICourierAdapter>([
             ["NovaPoshta", novaPoshtaAdapter],
             //["MeestExpress", meestExpressAdapter],
         ]);
+
+        this.startBackgroundUpdates();
     }
 
-    async trackParcel(trackingNumber: string, userId?: string) {
-        let parcel = await this.parcelRepository.findByTrackingNumber(
+    private startBackgroundUpdates() {
+        const updateWrapper = async () => {
+            if (this.updateInProgress) {
+                console.log(
+                    "Update already in progress, skipping this interval"
+                );
+                return;
+            }
+
+            try {
+                this.updateInProgress = true;
+                await this.updateFollowedParcels();
+            } catch (error) {
+                console.error("Background update error:", error);
+            } finally {
+                this.updateInProgress = false;
+                this.updateTimeout = setTimeout(
+                    updateWrapper,
+                    this.updateInterval
+                );
+            }
+        };
+
+        updateWrapper();
+    }
+
+    private async updateFollowedParcels() {
+        try {
+            const uniqueParcels =
+                await this.parcelRepository.findAllFollowedParcels();
+            console.log(`Found ${uniqueParcels.length} followed parcels...`);
+
+            let activeCount = 0;
+
+            for (const parcel of uniqueParcels) {
+                try {
+                    const status = (
+                        await this.statusService.findById(parcel.statusId)
+                    ).name;
+                    if (status && this.FINAL_STATUSES.includes(status)) {
+                        continue;
+                    }
+
+                    activeCount++;
+                    await this.updateSingleParcel(parcel);
+                } catch (error) {
+                    console.error(
+                        `Failed to update parcel ${parcel.trackingNumber}:`,
+                        error
+                    );
+                }
+            }
+
+            console.log(
+                `Updated ${activeCount} active parcels (${
+                    uniqueParcels.length - activeCount
+                } skipped with final status)`
+            );
+        } catch (error) {
+            console.error("Error fetching followed parcels:", error);
+        }
+    }
+
+    private async updateSingleParcel(parcel: Parcel) {
+        if (!parcel.courierId) return;
+
+        const status = (await this.statusService.findById(parcel.statusId))
+            .name;
+
+        if (status && this.FINAL_STATUSES.includes(status)) {
+            return;
+        }
+
+        const courier = await this.courierService.findById(parcel.courierId);
+        const adapter = this.adapters.get(courier.name);
+        if (!adapter) return;
+
+        try {
+            const result = await adapter.trackParcel(parcel.trackingNumber);
+            if (!result.success || !result.data) return;
+
+            const status = await this.statusService.findByName(
+                result.data.status
+            );
+
+            const updatedParcel = await this.parcelRepository.update(
+                parcel.id,
+                {
+                    statusId: status.id,
+                    status: result.data.status,
+                    fromLocation: result.data.fromLocation,
+                    toLocation: result.data.toLocation,
+                    factualWeight: result.data.factualWeight,
+                    updatedAt: new Date(),
+                }
+            );
+
+            if (!updatedParcel) return;
+
+            const newEvents =
+                result.data.movementHistory?.map(
+                    (event: IMovementEvent) =>
+                        new TrackingEvent({
+                            id: crypto.randomUUID(),
+                            parcelId: parcel.id,
+                            statusLocation: event.statusLocation,
+                            rawStatus: event.description,
+                            timestamp: new Date(event.timestamp),
+                            createdAt: new Date(),
+                            isNotified: false,
+                        })
+                ) || [];
+
+            await this.trackingEventService.checkAndUpdateTrackingEvents(
+                parcel.id,
+                newEvents
+            );
+
+            this.eventEmitter.emit("parcelUpdated", {
+                trackingNumber: parcel.trackingNumber,
+                status: result.data.status,
+                parcelId: parcel.id,
+            });
+
+            if (this.isFinalStatus(result.data.status)) {
+                this.eventEmitter.emit("parcelCompleted", {
+                    trackingNumber: parcel.trackingNumber,
+                    status: result.data.status,
+                    parcelId: parcel.id,
+                });
+            }
+
+            console.log(`Parcel ${parcel.trackingNumber} updated successfully`);
+        } catch (error) {
+            console.error(
+                `Error updating parcel ${parcel.trackingNumber} from courier:`,
+                error
+            );
+            throw error;
+        }
+    }
+
+    private isFinalStatus(status: string): boolean {
+        const finalStatuses = ["Доставлено", "Повернуто"];
+        return finalStatuses.includes(status);
+    }
+
+    async trackParcel(
+        trackingNumber: string,
+        userId?: string
+    ): Promise<ITrackingResponse> {
+        const parcel = await this.parcelRepository.findByTrackingNumber(
             trackingNumber
         );
 
-        if (parcel && parcel.courierId) {
+        if (parcel) {
+            return this.getParcelDataFromDb(parcel, userId);
+        }
+
+        return this.trackNewParcel(trackingNumber, userId);
+    }
+
+    private async getParcelDataFromDb(
+        parcel: Parcel,
+        userId?: string
+    ): Promise<ITrackingResponse> {
+        try {
             const courier = await this.courierService.findById(
                 parcel.courierId
             );
-            try {
-                if (this.adapters.has(courier.name)) {
-                    console.log(
-                        `Tracking parcel ${trackingNumber} with courier ${courier.name}`
-                    );
-                    const result = await this.adapters
-                        .get(courier.name)!
-                        .trackParcel(trackingNumber);
+            const status = await this.statusService.findById(parcel.statusId);
+            const events = await this.trackingEventService.findByParcelId(
+                parcel.id
+            );
 
-                    if (result.success && result.data) {
-                        if (userId) {
-                            result.data.isFollowed =
-                                await this.parcelRepository.isParcelFollowedByUserId(
-                                    userId,
-                                    trackingNumber
-                                );
-                        }
-
-                        const trackingEventsFromRequest =
-                            result.data.movementHistory?.map(
-                                (event: IMovementEvent) =>
-                                    new TrackingEvent({
-                                        id: crypto.randomUUID(),
-                                        parcelId: parcel.id,
-                                        statusLocation: event.statusLocation,
-                                        rawStatus: event.description,
-                                        timestamp: new Date(event.timestamp),
-                                        createdAt: new Date(),
-                                        isNotified: false,
-                                    })
-                            ) || [];
-
-                        await this.trackingEventService.checkAndUpdateTrackingEvents(
-                            parcel.id,
-                            trackingEventsFromRequest
-                        );
-                    }
-
-                    return result;
-                }
-            } catch (error) {
-                console.warn(`Tracking failed for ${courier.name}: `);
-            }
+            return {
+                success: true,
+                data: {
+                    trackingNumber: parcel.trackingNumber,
+                    status: status.name,
+                    factualWeight: parcel.factualWeight,
+                    fromLocation: parcel.fromLocation,
+                    toLocation: parcel.toLocation,
+                    isFollowed: userId
+                        ? await this.parcelRepository.isParcelFollowedByUserId(
+                              userId,
+                              parcel.id
+                          )
+                        : false,
+                    movementHistory: events
+                        ? events.map((event) => ({
+                              statusLocation: event.statusLocation,
+                              description: event.rawStatus,
+                              timestamp: event.timestamp.toISOString(),
+                          }))
+                        : [],
+                    lastUpdated: parcel.updatedAt.toISOString(),
+                },
+            };
+        } catch (error) {
+            console.error("Error getting parcel data from DB:", error);
+            return {
+                success: false,
+                error: "Failed to get parcel data",
+            };
         }
+    }
 
+    private async trackNewParcel(
+        trackingNumber: string,
+        userId?: string
+    ): Promise<ITrackingResponse> {
         for (const [courierName, adapter] of this.adapters.entries()) {
             try {
                 const result = await adapter.trackParcel(trackingNumber);
 
-                if (result?.success && result.data) {
-                    result.data.isFollowed = false;
-                    const parcelData = result.data;
+                if (result.success && result.data) {
+                    const courier = await this.courierService.findByName(
+                        courierName
+                    );
+                    const status = await this.statusService.findByName(
+                        result.data.status
+                    );
 
-                    const newParcel = {
+                    const newParcel = await this.parcelRepository.create({
                         id: crypto.randomUUID(),
                         trackingNumber,
-                        courierId: await (
-                            await this.courierService.findByName(courierName)
-                        ).id,
-                        statusId: await (
-                            await this.statusService.findByName(
-                                parcelData.status
-                            )
-                        ).id,
-                        status: parcelData.status,
-                        fromLocation: parcelData.fromLocation,
-                        toLocation: parcelData.toLocation,
-                    };
+                        courierId: courier.id,
+                        statusId: status.id,
+                        status: result.data.status,
+                        fromLocation: result.data.fromLocation,
+                        toLocation: result.data.toLocation,
+                        factualWeight: result.data.factualWeight,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    });
 
-                    await this.parcelRepository.create(newParcel);
-                    console.log(`Parcel ${trackingNumber} saved to DB.`);
+                    if (!newParcel) continue;
 
-                    const trackingEventsFromRequest =
-                        parcelData.movementHistory?.map(
+                    const events =
+                        result.data.movementHistory?.map(
                             (event: IMovementEvent) =>
                                 new TrackingEvent({
                                     id: crypto.randomUUID(),
@@ -155,18 +334,102 @@ export class TrackingService {
                                 })
                         ) || [];
 
-                    await this.trackingEventService.checkAndUpdateTrackingEvents(
-                        newParcel.id,
-                        trackingEventsFromRequest
-                    );
+                    await this.trackingEventService.create(events);
 
-                    return result;
+                    return {
+                        ...result,
+                        data: {
+                            ...result.data,
+                            isFollowed: userId
+                                ? await this.parcelRepository.isParcelFollowedByUserId(
+                                      userId,
+                                      newParcel.id
+                                  )
+                                : false,
+                            lastUpdated: new Date().toISOString(),
+                        },
+                    };
                 }
             } catch (error) {
-                console.warn(`Tracking failed for ${courierName}: `);
+                console.error(
+                    `Error tracking new parcel with ${courierName}:`,
+                    error
+                );
             }
         }
 
-        throw new Error("Parcel not found in any courier service");
+        return {
+            success: false,
+            error: "Parcel not found in any courier service",
+        };
+    }
+
+    async refreshParcel(trackingNumber: string): Promise<ITrackingResponse> {
+        try {
+            const parcel = await this.parcelRepository.findByTrackingNumber(
+                trackingNumber
+            );
+            if (!parcel) {
+                return {
+                    success: false,
+                    error: "Parcel not found",
+                };
+            }
+
+            await this.updateSingleParcel(parcel);
+            return this.getParcelDataFromDb(parcel);
+        } catch (error) {
+            console.error("Error refreshing parcel:", error);
+            return {
+                success: false,
+                error: "Failed to refresh parcel data",
+            };
+        }
+    }
+
+    onParcelUpdate(
+        parcelId: string,
+        callback: (data: {
+            trackingNumber: string;
+            status: string;
+            parcelId: string;
+            completed?: boolean;
+        }) => void
+    ) {
+        const updateListener = (data: {
+            trackingNumber: string;
+            status: string;
+            parcelId: string;
+        }) => {
+            if (data.parcelId === parcelId) {
+                callback(data);
+            }
+        };
+
+        const completeListener = (data: {
+            trackingNumber: string;
+            status: string;
+            parcelId: string;
+        }) => {
+            if (data.parcelId === parcelId) {
+                callback({ ...data, completed: true });
+                this.eventEmitter.off("parcelUpdated", updateListener);
+                this.eventEmitter.off("parcelCompleted", completeListener);
+            }
+        };
+
+        this.eventEmitter.on("parcelUpdated", updateListener);
+        this.eventEmitter.on("parcelCompleted", completeListener);
+
+        return () => {
+            this.eventEmitter.off("parcelUpdated", updateListener);
+            this.eventEmitter.off("parcelCompleted", completeListener);
+        };
+    }
+
+    stop() {
+        if (this.updateTimeout) {
+            clearTimeout(this.updateTimeout);
+        }
     }
 }

@@ -41,7 +41,7 @@ export class ParcelRepository {
                 status: parcelsTable.status,
                 fromLocation: parcelsTable.fromLocation,
                 toLocation: parcelsTable.toLocation,
-                isFollowed: parcelsTable.isFollowed,
+                factualWeight: parcelsTable.factualWeight,
                 createdAt: parcelsTable.createdAt,
                 updatedAt: parcelsTable.updatedAt,
             })
@@ -78,7 +78,7 @@ export class ParcelRepository {
     }
 
     async followParcel(userId: string, parcelId: string): Promise<void> {
-        if (await this.isParcelFollowed(userId, parcelId)) {
+        if (await this.isParcelFollowedByUserId(userId, parcelId)) {
             throw new Error("Parcel already followed");
         }
 
@@ -87,19 +87,6 @@ export class ParcelRepository {
             userId,
             parcelId,
         });
-    }
-
-    async isParcelFollowed(userId: string, parcelId: string): Promise<boolean> {
-        const followedParcels = await db
-            .select()
-            .from(followedParcelsTable)
-            .where(
-                and(
-                    eq(followedParcelsTable.userId, userId),
-                    eq(followedParcelsTable.parcelId, parcelId)
-                )
-            );
-        return followedParcels.length > 0;
     }
 
     async unfollowParcel(userId: string, parcelId: string): Promise<void> {
@@ -111,6 +98,30 @@ export class ParcelRepository {
                     eq(followedParcelsTable.parcelId, parcelId)
                 )
             );
+    }
+
+    async findAllFollowedParcels(): Promise<Parcel[]> {
+        const result = await db
+            .selectDistinctOn([parcelsTable.id], {
+                id: parcelsTable.id,
+                trackingNumber: parcelsTable.trackingNumber,
+                courierId: parcelsTable.courierId,
+                statusId: parcelsTable.statusId,
+                status: parcelsTable.status,
+                fromLocation: parcelsTable.fromLocation,
+                toLocation: parcelsTable.toLocation,
+                createdAt: parcelsTable.createdAt,
+                updatedAt: parcelsTable.updatedAt,
+                factualWeight: parcelsTable.factualWeight,
+            })
+            .from(followedParcelsTable)
+            .innerJoin(
+                parcelsTable,
+                eq(followedParcelsTable.parcelId, parcelsTable.id)
+            )
+            .execute();
+
+        return result.map((p) => new Parcel(p));
     }
 
     async create(

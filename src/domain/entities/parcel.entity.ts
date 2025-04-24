@@ -8,7 +8,7 @@ export class Parcel {
     courierId: string;
     fromLocation: string;
     toLocation: string;
-    isFollowed: boolean;
+    factualWeight: string;
     createdAt: Date;
     updatedAt: Date;
 
@@ -19,7 +19,7 @@ export class Parcel {
         this.courierId = parcel.courierId;
         this.fromLocation = parcel.fromLocation;
         this.toLocation = parcel.toLocation;
-        this.isFollowed = parcel.isFollowed;
+        this.factualWeight = parcel.factualWeight;
         this.createdAt = parcel.createdAt;
         this.updatedAt = parcel.updatedAt;
     }

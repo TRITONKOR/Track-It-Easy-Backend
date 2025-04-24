@@ -42,9 +42,9 @@ export const parcelsTable = pgTable("parcels", {
         .notNull()
         .references(() => statusesTable.id),
     status: varchar({ length: 255 }),
+    factualWeight: varchar({ length: 255 }).notNull(),
     fromLocation: varchar({ length: 255 }).notNull(),
     toLocation: varchar({ length: 255 }).notNull(),
-    isFollowed: boolean().default(false).notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 });
