@@ -63,7 +63,7 @@ export class TrackingService {
         trackingEventService: TrackingEventService,
         novaPoshtaAdapter: NovaPoshtaAdapter,
         meestExpressAdapter: MeestExpressAdapter,
-        updateIntervalMs: number = 60000
+        updateIntervalMs: number = 3600000
     ) {
         this.parcelRepository = parcelRepository;
         this.courierService = courierService;

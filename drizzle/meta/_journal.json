@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1742040702743,
-      "tag": "0000_bumpy_hitman",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1742490411215,
-      "tag": "0001_funny_thunderball",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1742499076304,
-      "tag": "0002_ancient_bloodscream",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1742750514299,
-      "tag": "0003_shiny_captain_midlands",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1743341020250,
-      "tag": "0004_wet_jetstream",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1744919263229,
-      "tag": "0005_fixed_wind_dancer",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1744920074027,
-      "tag": "0006_aromatic_psynapse",
+      "when": 1745588363334,
+      "tag": "0000_bored_machine_man",
       "breakpoints": true
     }
   ]
