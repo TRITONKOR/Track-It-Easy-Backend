@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
     boolean,
     pgEnum,
@@ -23,7 +24,9 @@ export const actionTypeEnum = pgEnum(
 );
 
 export const usersTable = pgTable("users", {
-    id: uuid().primaryKey(),
+    id: uuid()
+        .primaryKey()
+        .default(sql`uuid_generate_v4()`),
     username: varchar({ length: 255 }).notNull(),
     email: varchar({ length: 255 }).notNull().unique(),
     passwordHash: varchar({ length: 255 }).notNull(),
@@ -33,7 +36,9 @@ export const usersTable = pgTable("users", {
 });
 
 export const parcelsTable = pgTable("parcels", {
-    id: uuid().primaryKey(),
+    id: uuid()
+        .primaryKey()
+        .default(sql`uuid_generate_v4()`),
     trackingNumber: varchar({ length: 255 }).notNull().unique(),
     courierId: uuid()
         .notNull()
@@ -50,7 +55,9 @@ export const parcelsTable = pgTable("parcels", {
 });
 
 export const trackingEventsTable = pgTable("tracking_events", {
-    id: uuid().primaryKey(),
+    id: uuid()
+        .primaryKey()
+        .default(sql`uuid_generate_v4()`),
     parcelId: uuid()
         .notNull()
         .references(() => parcelsTable.id, { onDelete: "cascade" }),
@@ -62,7 +69,9 @@ export const trackingEventsTable = pgTable("tracking_events", {
 });
 
 export const couriersTable = pgTable("couriers", {
-    id: uuid().primaryKey(),
+    id: uuid()
+        .primaryKey()
+        .default(sql`uuid_generate_v4()`),
     name: courierEnum().notNull(),
     api: varchar({ length: 255 }).notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
@@ -77,7 +86,9 @@ export const statusesTable = pgTable("statuses", {
 });
 
 export const notificationsTable = pgTable("notifications", {
-    id: uuid().primaryKey(),
+    id: uuid()
+        .primaryKey()
+        .default(sql`uuid_generate_v4()`),
     parcelId: uuid()
         .notNull()
         .references(() => parcelsTable.id, { onDelete: "cascade" }),
@@ -90,7 +101,9 @@ export const notificationsTable = pgTable("notifications", {
 });
 
 export const adminActionsTable = pgTable("admin_actions", {
-    id: uuid().primaryKey(),
+    id: uuid()
+        .primaryKey()
+        .default(sql`uuid_generate_v4()`),
     userId: uuid()
         .notNull()
         .references(() => usersTable.id),
@@ -100,7 +113,9 @@ export const adminActionsTable = pgTable("admin_actions", {
 });
 
 export const followedParcelsTable = pgTable("followed_parcels", {
-    id: uuid().primaryKey(),
+    id: uuid()
+        .primaryKey()
+        .default(sql`uuid_generate_v4()`),
     userId: uuid()
         .notNull()
         .references(() => usersTable.id),

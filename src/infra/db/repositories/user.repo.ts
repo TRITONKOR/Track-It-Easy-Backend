@@ -2,8 +2,13 @@ import { eq } from "drizzle-orm";
 import { User } from "src/domain/entities/user.entity";
 import { db } from "../index";
 import { usersTable } from "../schema";
+import {
+    CreateUserData,
+    IUserRepository,
+    UpdateUserData,
+} from "./interfaces/UserRepository";
 
-export class UserRepository {
+export class UserRepository implements IUserRepository {
     async findById(id: string) {
         const users = await db
             .select()
@@ -12,7 +17,7 @@ export class UserRepository {
         return users[0] || null;
     }
 
-    async findByUsername(username: string): Promise<Partial<User> | null> {
+    async findByUsername(username: string): Promise<User | null> {
         const users = await db
             .select()
             .from(usersTable)
@@ -20,7 +25,7 @@ export class UserRepository {
         return users[0] || null;
     }
 
-    async findAll(): Promise<Partial<User>[]> {
+    async findAll(): Promise<User[]> {
         return await db.select().from(usersTable);
     }
 
@@ -35,15 +40,12 @@ export class UserRepository {
         return new User(users[0]);
     }
 
-    async create(user: typeof usersTable.$inferInsert): Promise<User> {
+    async create(user: CreateUserData): Promise<User> {
         const [newUser] = await db.insert(usersTable).values(user).returning();
         return new User(newUser);
     }
 
-    async update(
-        id: string,
-        updatedFields: Partial<typeof usersTable.$inferInsert>
-    ): Promise<User> {
+    async update(id: string, updatedFields: UpdateUserData): Promise<User> {
         const [updatedUser] = await db
             .update(usersTable)
             .set({ ...updatedFields, updatedAt: new Date() })
