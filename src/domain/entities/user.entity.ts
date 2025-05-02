@@ -19,12 +19,4 @@ export class User {
         this.createdAt = user.createdAt;
         this.updatedAt = user.updatedAt;
     }
-
-    setName(username: string): void {
-        this.username = username;
-    }
-
-    isAdmin(): boolean {
-        return this.role === "admin";
-    }
 }

@@ -9,7 +9,6 @@ import { config } from "./config/config";
 import { authenticateToken } from "./middleware/authMiddleware";
 
 import fastifyCookie from "@fastify/cookie";
-import "reflect-metadata";
 
 const bootstrapFastify = (): FastifyInstance => {
     const fastify = Fastify({

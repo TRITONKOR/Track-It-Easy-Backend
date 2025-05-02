@@ -13,6 +13,7 @@ import { CourierService } from "src/domain/services/courier.service";
 import { ParcelService } from "src/domain/services/parcel.service";
 import { StatusService } from "src/domain/services/status.service";
 import { TrackingEventService } from "src/domain/services/trackingEvent.service";
+import { UserService } from "src/domain/services/user.service";
 import { UserRepository } from "src/infra/db/repositories/user.repo";
 
 const userRepository = new UserRepository();
@@ -22,6 +23,7 @@ const statusRepository = new StatusRepository();
 const trackingEventRepository = new TrackingEventRepository();
 
 const jwtService = new JwtService();
+const userService = new UserService(userRepository);
 const parcelService = new ParcelService(parcelRepository);
 const courierService = new CourierService(courierRepository);
 const statusService = new StatusService(statusRepository);
@@ -38,6 +40,7 @@ const repositories = {
 const services = {
     jwtService,
     courierService,
+    userService,
     trackingService: new TrackingService(
         parcelRepository,
         courierService,
