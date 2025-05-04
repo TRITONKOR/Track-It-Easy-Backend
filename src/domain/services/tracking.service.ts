@@ -8,6 +8,8 @@ import { CourierService } from "./courier.service";
 import { StatusService } from "./status.service";
 import { TrackingEventService } from "./trackingEvent.service";
 
+import { CronJob } from "cron";
+
 export interface ICourierAdapter {
     trackParcel(trackingNumber: string): Promise<ITrackingResponse>;
 }
@@ -44,10 +46,11 @@ export class TrackingService {
     private courierService;
     private statusService;
     private trackingEventService;
-    private updateInterval: number;
+    private updateInterval: string;
     private eventEmitter: EventEmitter;
     private updateInProgress: boolean;
     private updateTimeout?: NodeJS.Timeout;
+    private backgroundUpdateJob: CronJob | null = null;
 
     private readonly FINAL_STATUSES = [
         "Доставлено",
@@ -63,7 +66,7 @@ export class TrackingService {
         trackingEventService: TrackingEventService,
         novaPoshtaAdapter: NovaPoshtaAdapter,
         meestExpressAdapter: MeestExpressAdapter,
-        updateIntervalMs: number = 3600000
+        updateIntervalMs: string = "0 */1 * * *"
     ) {
         this.parcelRepository = parcelRepository;
         this.courierService = courierService;
@@ -71,40 +74,70 @@ export class TrackingService {
         this.trackingEventService = trackingEventService;
         this.updateInterval = updateIntervalMs;
         this.eventEmitter = new EventEmitter();
-        this.updateInProgress = false;
+        this.startBackgroundUpdates();
 
         this.adapters = new Map<string, ICourierAdapter>([
             ["NovaPoshta", novaPoshtaAdapter],
             //["MeestExpress", meestExpressAdapter],
         ]);
-
-        this.startBackgroundUpdates();
     }
 
     private startBackgroundUpdates() {
-        const updateWrapper = async () => {
-            if (this.updateInProgress) {
-                console.log(
-                    "Update already in progress, skipping this interval"
-                );
-                return;
-            }
+        console.log(
+            `Starting background updates with interval: ${this.updateInterval}`
+        );
 
-            try {
-                this.updateInProgress = true;
-                await this.updateFollowedParcels();
-            } catch (error) {
-                console.error("Background update error:", error);
-            } finally {
-                this.updateInProgress = false;
-                this.updateTimeout = setTimeout(
-                    updateWrapper,
-                    this.updateInterval
-                );
-            }
-        };
+        if (this.backgroundUpdateJob) {
+            this.backgroundUpdateJob.stop();
+            console.log("Stopped previous background update job");
+        }
 
-        updateWrapper();
+        try {
+            this.backgroundUpdateJob = new CronJob(
+                this.updateInterval,
+                async () => {
+                    console.log(
+                        "Cron job triggered at",
+                        new Date().toISOString()
+                    );
+
+                    if (this.updateInProgress) {
+                        console.log("Update already in progress, skipping...");
+                        return;
+                    }
+
+                    try {
+                        this.updateInProgress = true;
+                        console.log("Starting parcels update...");
+                        await this.updateFollowedParcels();
+                    } catch (error) {
+                        console.error("Background update error:", error);
+                    } finally {
+                        this.updateInProgress = false;
+                        console.log(
+                            "Update completed at",
+                            new Date().toISOString()
+                        );
+                    }
+                },
+                null,
+                true,
+                "UTC"
+            );
+
+            console.log("Background updates started successfully");
+        } catch (e) {
+            console.error("Failed to create CronJob:", e);
+        }
+    }
+
+    stop() {
+        if (this.updateTimeout) {
+            clearTimeout(this.updateTimeout);
+        }
+        if (this.backgroundUpdateJob) {
+            this.backgroundUpdateJob.stop();
+        }
     }
 
     private async updateFollowedParcels() {
@@ -425,11 +458,5 @@ export class TrackingService {
             this.eventEmitter.off("parcelUpdated", updateListener);
             this.eventEmitter.off("parcelCompleted", completeListener);
         };
-    }
-
-    stop() {
-        if (this.updateTimeout) {
-            clearTimeout(this.updateTimeout);
-        }
     }
 }
