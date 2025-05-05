@@ -44,6 +44,6 @@ export const unfollowParcel = {
             return reply.code(400).send({ message: result });
         }
 
-        return reply.code(201).send(result);
+        return reply.code(201).send();
     },
 };

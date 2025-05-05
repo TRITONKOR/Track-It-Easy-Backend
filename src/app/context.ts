@@ -41,6 +41,7 @@ const services = {
     jwtService,
     courierService,
     userService,
+    trackingEventService,
     trackingService: new TrackingService(
         parcelRepository,
         courierService,
