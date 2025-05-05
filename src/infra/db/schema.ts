@@ -46,7 +46,7 @@ export const parcelsTable = pgTable("parcels", {
     statusId: uuid()
         .notNull()
         .references(() => statusesTable.id),
-    status: varchar({ length: 255 }),
+    status: varchar({ length: 255 }).notNull(),
     factualWeight: varchar({ length: 255 }).notNull(),
     fromLocation: varchar({ length: 255 }).notNull(),
     toLocation: varchar({ length: 255 }).notNull(),

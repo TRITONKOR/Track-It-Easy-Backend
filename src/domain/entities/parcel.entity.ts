@@ -5,6 +5,7 @@ export class Parcel {
     id: string;
     trackingNumber: string;
     statusId: string;
+    status: string;
     courierId: string;
     fromLocation: string;
     toLocation: string;
@@ -16,19 +17,12 @@ export class Parcel {
         this.id = parcel.id;
         this.trackingNumber = parcel.trackingNumber;
         this.statusId = parcel.statusId;
+        this.status = parcel.status;
         this.courierId = parcel.courierId;
         this.fromLocation = parcel.fromLocation;
         this.toLocation = parcel.toLocation;
         this.factualWeight = parcel.factualWeight;
         this.createdAt = parcel.createdAt;
         this.updatedAt = parcel.updatedAt;
-    }
-
-    setStatusId(statusId: string): void {
-        this.statusId = statusId;
-    }
-
-    getId(): string {
-        return this.id;
     }
 }

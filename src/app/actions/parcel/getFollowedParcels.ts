@@ -1,7 +1,7 @@
 import { ParcelRepository } from "@db/repositories/parcel.repo";
 import { HttpException } from "src/api/errors/httpException";
 
-export class GetSavedParcelsAction {
+export class GetFollowedParcelsAction {
     private parcelRepository: ParcelRepository;
 
     constructor({ parcelRepository }: { parcelRepository: ParcelRepository }) {
@@ -17,7 +17,10 @@ export class GetSavedParcelsAction {
             return await this.parcelRepository.findByUserId(userId);
         } catch (error) {
             console.error(error);
-            throw new HttpException(500, "Failed to fetch saved parcels");
+            throw new HttpException(
+                500,
+                "Failed to fetch followed parcels by user"
+            );
         }
     }
 }
