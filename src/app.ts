@@ -67,11 +67,17 @@ const bootstrapFastify = (): FastifyInstance => {
     patchContext(fastify);
     patchRouting(fastify);
 
-    const publicRoutes = ["/auth/login", "/auth/register", "/auth/refresh"];
+    const publicRoutes = [
+        "/auth/login",
+        "/auth/register",
+        "/auth/refresh",
+        "/track",
+    ];
 
     fastify.addHook("preHandler", async (request, reply) => {
         const routePath = request.routeOptions.url ?? "";
         if (publicRoutes.includes(routePath)) {
+            console.log("Public route, skipping authentication:", routePath);
             return;
         }
 

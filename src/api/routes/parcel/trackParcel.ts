@@ -4,6 +4,7 @@ import {
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
+import { ParcelAlreadyExistsException } from "src/api/errors/httpException";
 import { TrackParcelAction } from "src/app/actions/parcel/trackParcel";
 
 interface TrackParcelRequest extends RequestGenericInterface {
@@ -34,15 +35,35 @@ export const trackParcel = {
         request: FastifyRequest<TrackParcelRequest>,
         reply: FastifyReply
     ) => {
-        const { trackingNumber, userId } = request.body;
+        try {
+            const { trackingNumber, userId } = request.body;
 
-        const result = await new TrackParcelAction(
-            request.server.domainContext
-        ).execute(trackingNumber, userId);
+            const result = await new TrackParcelAction(
+                request.server.domainContext
+            ).execute(trackingNumber, userId);
 
-        if (typeof result === "string") {
-            return reply.code(400).send({ message: result });
+            if (typeof result === "string") {
+                return reply.status(400).send({
+                    success: false,
+                    error: result,
+                });
+            }
+
+            return reply.send(result);
+        } catch (error) {
+            if (error instanceof ParcelAlreadyExistsException) {
+                return reply.status(error.statusCode).send({
+                    success: false,
+                    error: error.message,
+                    code: error.code,
+                });
+            }
+
+            console.error("Error tracking parcel:", error);
+            return reply.status(500).send({
+                success: false,
+                error: "Internal server error",
+            });
         }
-        return reply.code(201).send(result);
     },
 };
