@@ -9,6 +9,7 @@ import { StatusService } from "./status.service";
 import { TrackingEventService } from "./trackingEvent.service";
 
 import { CronJob } from "cron";
+import { ParcelAlreadyExistsException } from "src/api/errors/httpException";
 
 export interface ICourierAdapter {
     trackParcel(trackingNumber: string): Promise<ITrackingResponse>;
@@ -270,6 +271,9 @@ export class TrackingService {
         );
 
         if (parcel) {
+            if (!userId) {
+                throw new ParcelAlreadyExistsException();
+            }
             return this.getParcelDataFromDb(parcel, userId);
         }
 

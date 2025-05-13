@@ -22,7 +22,7 @@ export class TrackParcelAction {
             return response;
         } catch (error) {
             console.error(error);
-            throw new HttpException(401, "Track package failed");
+            throw error;
         }
     }
 }
