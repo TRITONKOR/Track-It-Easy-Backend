@@ -10,8 +10,7 @@ export const config = {
     REFRESH_SECRET: process.env.REFRESH_SECRET || "refresh",
     IS_DEV_ENV: process.env.NODE_ENV === "development",
     COOKIE_SECRET: process.env.COOKIE_SECRET || "cookie",
-    NOVA_POSHTA_API_KEY:
-        process.env.NOVA_POSHTA_API_KEY || "REMOVED_KEY",
+    NOVA_POSHTA_API_KEY: process.env.NOVA_POSHTA_API_KEY || "",
     NOVA_POSHTA_API_URL:
         process.env.NOVA_POSHTA_API_URL ||
         "https://api.novaposhta.ua/v2.0/json/",
