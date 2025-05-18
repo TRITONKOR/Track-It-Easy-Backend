@@ -1,6 +1,6 @@
+import { Status } from "@/domain/entities/status.entity";
 import { statusesTable } from "@db/schema";
 import { eq } from "drizzle-orm";
-import { Status } from "src/domain/entities/status.entity";
 import { db } from "../index";
 
 export class StatusRepository {

@@ -1,6 +1,6 @@
+import { HttpException } from "@/api/errors/httpException";
 import { ParcelRepository } from "@db/repositories/parcel.repo";
 import { parcelsTable } from "@db/schema";
-import { HttpException } from "src/api/errors/httpException";
 import { Parcel } from "../entities/parcel.entity";
 
 export class ParcelService {
@@ -68,7 +68,7 @@ export class ParcelService {
             const isFollowed =
                 await this.parcelRepository.isParcelFollowedByUserId(
                     userId,
-                    parcel.getId()
+                    parcel.id
                 );
             return isFollowed;
         } catch (error) {

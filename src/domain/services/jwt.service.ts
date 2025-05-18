@@ -1,5 +1,5 @@
+import { config } from "@config/config";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { config } from "../../config/config";
 
 export class JwtService {
     private accessTokenSecret: string;

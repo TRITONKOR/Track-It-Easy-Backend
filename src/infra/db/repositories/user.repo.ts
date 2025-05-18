@@ -1,5 +1,5 @@
+import { User } from "@/domain/entities/user.entity";
 import { eq } from "drizzle-orm";
-import { User } from "src/domain/entities/user.entity";
 import { db } from "../index";
 import { usersTable } from "../schema";
 import {

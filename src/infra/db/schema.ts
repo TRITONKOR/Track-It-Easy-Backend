@@ -1,3 +1,4 @@
+import { ActionType } from "@/utils/ActionType";
 import { sql } from "drizzle-orm";
 import {
     boolean,
@@ -7,7 +8,6 @@ import {
     uuid,
     varchar,
 } from "drizzle-orm/pg-core";
-import { ActionType } from "src/utils/ActionType";
 
 export const userRoleEnum = pgEnum("user_role", ["admin", "user"]);
 export const notificationTypeEnum = pgEnum("notification_type", [

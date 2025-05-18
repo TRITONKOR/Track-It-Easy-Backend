@@ -1,6 +1,6 @@
+import { ActionType } from "@/utils/ActionType";
 import { adminActionsTable } from "@db/schema";
 import { InferSelectModel } from "drizzle-orm";
-import { ActionType } from "src/utils/ActionType";
 
 export class AdminAction {
     id: string;

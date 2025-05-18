@@ -1,6 +1,6 @@
+import { TrackingEvent } from "@/domain/entities/trackingEvent.entity";
 import { trackingEventsTable } from "@db/schema";
 import { eq } from "drizzle-orm";
-import { TrackingEvent } from "src/domain/entities/trackingEvent.entity";
 import { db } from "../index";
 
 export class TrackingEventRepository {

@@ -1,6 +1,6 @@
+import { HttpException } from "@/api/errors/httpException";
+import { UserService } from "@/domain/services/user.service";
 import { UpdateUserData } from "@db/repositories/interfaces/UserRepository";
-import { HttpException } from "src/api/errors/httpException";
-import { UserService } from "src/domain/services/user.service";
 
 export class UpdateUserAction {
     private userService: UserService;

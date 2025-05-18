@@ -1,6 +1,6 @@
-import { HttpException } from "src/api/errors/httpException";
-import { Parcel } from "src/domain/entities/parcel.entity";
-import { TrackingEventService } from "src/domain/services/trackingEvent.service";
+import { HttpException } from "@/api/errors/httpException";
+import { Parcel } from "@/domain/entities/parcel.entity";
+import { TrackingEventService } from "@/domain/services/trackingEvent.service";
 
 export class GetTrackingEventByParcelAction {
     private trackingEventService: TrackingEventService;

@@ -1,11 +1,11 @@
+import { ParcelAlreadyExistsException } from "@/api/errors/httpException";
+import { TrackParcelAction } from "@/app/actions/parcel/trackParcel";
 import {
     FastifyReply,
     FastifyRequest,
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { ParcelAlreadyExistsException } from "src/api/errors/httpException";
-import { TrackParcelAction } from "src/app/actions/parcel/trackParcel";
 
 interface TrackParcelRequest extends RequestGenericInterface {
     Body: {

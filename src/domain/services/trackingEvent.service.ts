@@ -1,6 +1,6 @@
+import { HttpException } from "@/api/errors/httpException";
 import { TrackingEventRepository } from "@db/repositories/trackingEvent.repo";
 import { trackingEventsTable } from "@db/schema";
-import { HttpException } from "src/api/errors/httpException";
 import { TrackingEvent } from "../entities/trackingEvent.entity";
 
 export class TrackingEventService {

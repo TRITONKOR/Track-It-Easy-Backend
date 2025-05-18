@@ -1,6 +1,6 @@
+import { HttpException } from "@/api/errors/httpException";
 import { CourierRepository } from "@db/repositories/courier.repo";
 import { couriersTable } from "@db/schema";
-import { HttpException } from "src/api/errors/httpException";
 import { Courier } from "../entities/courier.entity";
 
 export class CourierService {

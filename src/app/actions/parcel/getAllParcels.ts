@@ -1,26 +1,19 @@
 import { HttpException } from "@/api/errors/httpException";
 import { ParcelRepository } from "@db/repositories/parcel.repo";
 
-export class GetFollowedParcelsAction {
+export class GetAllParcelsAction {
     private parcelRepository: ParcelRepository;
 
     constructor({ parcelRepository }: { parcelRepository: ParcelRepository }) {
         this.parcelRepository = parcelRepository;
     }
 
-    async execute(userId: string) {
-        if (!userId) {
-            throw new HttpException(401, "Unauthorized");
-        }
-
+    async execute() {
         try {
-            return await this.parcelRepository.findByUserId(userId);
+            return await this.parcelRepository.findAll();
         } catch (error) {
             console.error(error);
-            throw new HttpException(
-                500,
-                "Failed to fetch followed parcels by user"
-            );
+            throw new HttpException(500, "Failed to fetch parcels");
         }
     }
 }

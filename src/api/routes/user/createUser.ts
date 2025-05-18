@@ -1,10 +1,10 @@
+import { CreateUserAction } from "@/app/actions/user/createUser";
 import {
     FastifyReply,
     FastifyRequest,
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { CreateUserAction } from "src/app/actions/user/createUser";
 
 interface CreateUserRequest extends RequestGenericInterface {
     Body: {

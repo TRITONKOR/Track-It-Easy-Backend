@@ -1,5 +1,5 @@
-import { HttpException } from "src/api/errors/httpException";
-import { AuthService } from "src/domain/services/auth.service";
+import { HttpException } from "@/api/errors/httpException";
+import { AuthService } from "@/domain/services/auth.service";
 
 export class LoginAction {
     private authService: AuthService;

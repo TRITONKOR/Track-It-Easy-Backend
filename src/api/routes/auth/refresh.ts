@@ -22,11 +22,7 @@ export const refresh = {
         try {
             const { accessToken, refreshToken, user } = await new RefreshAction(
                 request.server.domainContext
-            ).execute(
-                _refreshToken,
-
-                request.server.requestContext.get("sessionData")
-            );
+            ).execute(_refreshToken);
 
             return reply
                 .setCookie("x-session", refreshToken, {

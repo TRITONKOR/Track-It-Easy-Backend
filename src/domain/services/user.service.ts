@@ -1,10 +1,10 @@
+import { HttpException } from "@/api/errors/httpException";
 import {
     CreateUserData,
     IUserRepository,
     UpdateUserData,
 } from "@db/repositories/interfaces/UserRepository";
 import bcrypt from "bcrypt";
-import { HttpException } from "src/api/errors/httpException";
 import { User } from "../entities/user.entity";
 
 export class UserService {

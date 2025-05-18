@@ -1,5 +1,5 @@
-import { HttpException } from "src/api/errors/httpException";
-import { TrackingService } from "src/domain/services/tracking.service";
+import { HttpException } from "@/api/errors/httpException";
+import { TrackingService } from "@/domain/services/tracking.service";
 
 export class TrackParcelAction {
     private trackingService: TrackingService;

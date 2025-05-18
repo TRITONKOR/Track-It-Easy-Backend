@@ -1,10 +1,10 @@
+import { FollowParcelAction } from "@/app/actions/parcel/followParcel";
 import {
     FastifyReply,
     FastifyRequest,
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { FollowParcelAction } from "src/app/actions/parcel/followParcel";
 
 interface FollowParcelRequest extends RequestGenericInterface {
     Body: {

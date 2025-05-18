@@ -1,5 +1,5 @@
-import { HttpException } from "src/api/errors/httpException";
-import { ParcelService } from "src/domain/services/parcel.service";
+import { HttpException } from "@/api/errors/httpException";
+import { ParcelService } from "@/domain/services/parcel.service";
 
 export class UnfollowParcelAction {
     private parcelService: ParcelService;
@@ -40,10 +40,7 @@ export class UnfollowParcelAction {
                 );
             }
 
-            await this.parcelService.unfollowParcel(
-                userId,
-                existingParcel.getId()
-            );
+            await this.parcelService.unfollowParcel(userId, existingParcel.id);
 
             return { trackingNumber, userId };
         } catch (error) {

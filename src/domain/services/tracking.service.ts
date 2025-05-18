@@ -8,8 +8,8 @@ import { CourierService } from "./courier.service";
 import { StatusService } from "./status.service";
 import { TrackingEventService } from "./trackingEvent.service";
 
+import { ParcelAlreadyExistsException } from "@/api/errors/httpException";
 import { CronJob } from "cron";
-import { ParcelAlreadyExistsException } from "src/api/errors/httpException";
 
 export interface ICourierAdapter {
     trackParcel(trackingNumber: string): Promise<ITrackingResponse>;
@@ -49,7 +49,7 @@ export class TrackingService {
     private trackingEventService;
     private updateInterval: string;
     private eventEmitter: EventEmitter;
-    private updateInProgress: boolean;
+    private updateInProgress = false;
     private updateTimeout?: NodeJS.Timeout;
     private backgroundUpdateJob: CronJob | null = null;
 
@@ -285,9 +285,9 @@ export class TrackingService {
         userId?: string
     ): Promise<ITrackingResponse> {
         try {
-            const courier = await this.courierService.findById(
-                parcel.courierId
-            );
+            // const courier = await this.courierService.findById(
+            //     parcel.courierId
+            // );
             const status = await this.statusService.findById(parcel.statusId);
             const events = await this.trackingEventService.findByParcelId(
                 parcel.id

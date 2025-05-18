@@ -5,7 +5,7 @@ import {
     RouteShorthandOptions,
 } from "fastify";
 
-import { LoginAction } from "src/app/actions/auth/login";
+import { LoginAction } from "@/app/actions/auth/login";
 
 interface LoginRequest extends RequestGenericInterface {
     Body: {

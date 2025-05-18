@@ -1,11 +1,11 @@
+import { GetFollowedParcelsAction } from "@/app/actions/parcel/getFollowedParcels";
+import { GetTrackingEventByParcelAction } from "@/app/actions/trackingEvent/getTrackingEventByParcel";
 import {
     FastifyReply,
     FastifyRequest,
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { GetFollowedParcelsAction } from "src/app/actions/parcel/getFollowedParcels";
-import { GetTrackingEventByParcelAction } from "src/app/actions/trackingEvent/getTrackingEventByParcel";
 
 interface GetFollowedParcelsRequest extends RequestGenericInterface {
     Body: {

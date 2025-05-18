@@ -1,7 +1,8 @@
+import { HttpException } from "@/api/errors/httpException";
+import { User } from "@/domain/entities/user.entity";
 import { UserRepository } from "@db/repositories/user.repo";
 import bcrypt from "bcrypt";
-import { HttpException } from "src/api/errors/httpException";
-import { User } from "src/domain/entities/user.entity";
+import crypto from "crypto";
 import { JwtService } from "./jwt.service";
 
 export class AuthService {
@@ -27,7 +28,6 @@ export class AuthService {
         const passwordHash = await this.generatePasswordHash(password);
 
         const newUser = await this.userRepository.create({
-            id: crypto.randomUUID(),
             username,
             email,
             passwordHash: passwordHash,
@@ -57,7 +57,7 @@ export class AuthService {
     }
 
     async #authorizeUser(user: Omit<Partial<User>, "passwordHash">) {
-        const sessionId = require("crypto").randomBytes(6).toString("hex");
+        const sessionId = crypto.randomBytes(6).toString("hex");
 
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.createAccessToken({
@@ -95,7 +95,7 @@ export class AuthService {
 
         const { sessionId, userId } = payload;
 
-        const user = await this.userRepository.findById(payload.userId);
+        const user = await this.userRepository.findById(userId);
         if (!user) {
             throw new HttpException(404, "User not found");
         }
@@ -107,7 +107,7 @@ export class AuthService {
 
         const newRefreshToken = this.jwtService.createRefreshToken({
             userId: user.id,
-            sessionId: payload.sessionId,
+            sessionId: sessionId,
         });
 
         return {

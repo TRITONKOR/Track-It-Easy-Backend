@@ -1,10 +1,10 @@
+import { UpdateUserAction } from "@/app/actions/user/updateUser";
 import {
     FastifyReply,
     FastifyRequest,
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { UpdateUserAction } from "src/app/actions/user/updateUser";
 
 interface UpdateUserRequest extends RequestGenericInterface {
     Params: {

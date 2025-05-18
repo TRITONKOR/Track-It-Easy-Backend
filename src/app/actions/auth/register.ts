@@ -1,6 +1,6 @@
+import { HttpException } from "@/api/errors/httpException";
+import { AuthService } from "@/domain/services/auth.service";
 import { UserRepository } from "@db/repositories/user.repo";
-import { HttpException } from "src/api/errors/httpException";
-import { AuthService } from "src/domain/services/auth.service";
 
 export class RegisterAction {
     private userRepository: UserRepository;

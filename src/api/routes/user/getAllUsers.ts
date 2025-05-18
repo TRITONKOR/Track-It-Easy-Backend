@@ -1,10 +1,10 @@
+import { GetAllUsersAction } from "@/app/actions/user/getAllUsers";
 import {
     FastifyReply,
     FastifyRequest,
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { GetAllUsersAction } from "src/app/actions/user/getAllUsers";
 
 interface GetAllUsersRequest extends RequestGenericInterface {
     Body: {};

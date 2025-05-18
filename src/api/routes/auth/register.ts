@@ -1,10 +1,10 @@
+import { RegisterAction } from "@/app/actions/auth/register";
 import {
     FastifyReply,
     FastifyRequest,
     RequestGenericInterface,
     RouteShorthandOptions,
 } from "fastify";
-import { RegisterAction } from "src/app/actions/auth/register";
 
 interface RegisterRequest extends RequestGenericInterface {
     Body: {

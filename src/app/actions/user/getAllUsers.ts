@@ -1,6 +1,6 @@
-import { HttpException } from "src/api/errors/httpException";
-import { User } from "src/domain/entities/user.entity";
-import { UserService } from "src/domain/services/user.service";
+import { HttpException } from "@/api/errors/httpException";
+import { User } from "@/domain/entities/user.entity";
+import { UserService } from "@/domain/services/user.service";
 
 export class GetAllUsersAction {
     private userService: UserService;

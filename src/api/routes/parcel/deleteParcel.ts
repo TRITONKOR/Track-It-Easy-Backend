@@ -1,4 +1,4 @@
-import { DeleteUserAction } from "@/app/actions/user/deleteUser";
+import { DeleteParcelAction } from "@/app/actions/parcel/deleteParcel";
 import {
     FastifyReply,
     FastifyRequest,
@@ -6,13 +6,13 @@ import {
     RouteShorthandOptions,
 } from "fastify";
 
-interface DeleteUserRequest extends RequestGenericInterface {
+interface DeleteParcelRequest extends RequestGenericInterface {
     Params: {
         id: string;
     };
 }
 
-const deleteUserOptions: RouteShorthandOptions = {
+const deleteParcelOptions: RouteShorthandOptions = {
     schema: {
         params: {
             type: "object",
@@ -24,17 +24,17 @@ const deleteUserOptions: RouteShorthandOptions = {
     },
 };
 
-export const deleteUser = {
-    url: "/users/:id",
+export const deleteParcel = {
+    url: "/parcels/:id",
     method: "DELETE" as const,
-    schema: deleteUserOptions.schema,
+    schema: deleteParcelOptions.schema,
     handler: async (
-        request: FastifyRequest<DeleteUserRequest>,
+        request: FastifyRequest<DeleteParcelRequest>,
         reply: FastifyReply
     ) => {
         const { id } = request.params;
 
-        const result = await new DeleteUserAction(
+        const result = await new DeleteParcelAction(
             request.server.domainContext
         ).execute(id, "fgd");
 

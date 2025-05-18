@@ -3,12 +3,14 @@
     "version": "1.0.0",
     "main": "app.js",
     "scripts": {
-        "dev": "tsx --inspect=0.0.0.0:9229 src/server.ts",
-        "build": "tsx",
+        "dev": "tsx watch src/server.ts",
+        "dev:debug": "tsx --inspect=0.0.0.0:9229 --watch src/index.ts",
+        "build": "tsc && tsc-alias",
         "start": "node dist/server.js",
         "migrate": "npx drizzle-kit push"
     },
     "keywords": [],
+    "type": "module",
     "author": "",
     "license": "ISC",
     "description": "",
@@ -35,8 +37,9 @@
         "@types/pg": "^8.11.11",
         "drizzle-kit": "^0.30.4",
         "ts-node": "^10.9.2",
-        "tsconfig-paths": "^4.2.0",
-        "tsx": "^4.19.2",
-        "typescript": "^5.7.2"
+        "fastify-tsconfig": "^3.0.0",
+        "tsx": "^4.19.3",
+        "typescript": "^5.8.2",
+        "tsc-alias": "^1.8.11"
     }
 }

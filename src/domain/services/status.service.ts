@@ -1,6 +1,6 @@
+import { HttpException } from "@/api/errors/httpException";
 import { StatusRepository } from "@db/repositories/status.repo";
 import { statusesTable } from "@db/schema";
-import { HttpException } from "src/api/errors/httpException";
 import { Status } from "../entities/status.entity";
 
 export class StatusService {

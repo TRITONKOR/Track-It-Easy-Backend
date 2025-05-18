@@ -1,6 +1,6 @@
+import { JwtService } from "@/domain/services/jwt.service";
 import { UserRepository } from "@db/repositories/user.repo";
 import { FastifyReply, FastifyRequest } from "fastify";
-import { JwtService } from "src/domain/services/jwt.service";
 
 const jwtService = new JwtService();
 const userRepository = new UserRepository();

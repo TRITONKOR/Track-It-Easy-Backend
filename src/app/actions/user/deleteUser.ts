@@ -1,5 +1,5 @@
-import { HttpException } from "src/api/errors/httpException";
-import { UserService } from "src/domain/services/user.service";
+import { HttpException } from "@/api/errors/httpException";
+import { UserService } from "@/domain/services/user.service";
 
 export class DeleteUserAction {
     private userService: UserService;
