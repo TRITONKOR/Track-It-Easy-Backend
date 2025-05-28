@@ -1,7 +1,7 @@
 import { HttpException } from "@/api/errors/httpException";
 import { User } from "@/domain/entities/user.entity";
 import { UserRepository } from "@db/repositories/user.repo";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { JwtService } from "./jwt.service";
 

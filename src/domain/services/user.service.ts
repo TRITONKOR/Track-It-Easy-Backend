@@ -4,7 +4,7 @@ import {
     IUserRepository,
     UpdateUserData,
 } from "@db/repositories/interfaces/UserRepository";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { User } from "../entities/user.entity";
 
 export class UserService {
