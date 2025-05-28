@@ -9,7 +9,7 @@ export const authenticateToken = async (
     request: FastifyRequest,
     reply: FastifyReply
 ) => {
-    const authHeader = request.headers.authorization;
+    const authHeader = request.headers["x-Authorization"]?.toString();
     const token = authHeader?.split(" ")[1];
 
     if (!token) {
