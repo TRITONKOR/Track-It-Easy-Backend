@@ -5,6 +5,7 @@ import {
     RouteShorthandOptions,
 } from "fastify";
 
+import { HttpException } from "@/api/errors/httpException";
 import { LoginAction } from "@/app/actions/auth/login";
 
 interface LoginRequest extends RequestGenericInterface {
@@ -62,9 +63,13 @@ export const login = {
         } catch (error) {
             console.error("Error during sign-in:", error);
 
-            return reply
-                .code(400)
-                .send({ message: "Invalid email or password" });
+            if (error instanceof HttpException) {
+                return reply
+                    .code(error.statusCode)
+                    .send({ message: error.message });
+            }
+
+            return reply.code(500).send({ message: "Error during sign-in" });
         }
     },
 };

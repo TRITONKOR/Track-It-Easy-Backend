@@ -54,7 +54,7 @@ export const getFollowedParcels = {
             const parcelsWithTrackingEvents = followedParcels.map(
                 (parcel, index) => ({
                     ...parcel,
-                    trackingEvents: trackingEvents[index],
+                    movementHistory: trackingEvents[index],
                 })
             );
 

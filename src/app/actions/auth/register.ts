@@ -33,6 +33,7 @@ export class RegisterAction {
                 password,
             });
         } catch (error) {
+            console.error("Registration error:", error);
             throw new HttpException(401, "Registration failed");
         }
     }

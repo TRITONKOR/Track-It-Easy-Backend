@@ -8,6 +8,20 @@
       "when": 1745588363334,
       "tag": "0000_bored_machine_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1748460007313,
+      "tag": "0001_wakeful_wong",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1748460188916,
+      "tag": "0002_bent_ezekiel",
+      "breakpoints": true
     }
   ]
 }

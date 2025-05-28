@@ -1,5 +1,5 @@
 {
-  "id": "4e9b79f7-b58a-41db-9888-ae1a4aac17f3",
+  "id": "95b62e16-05f1-47be-8b1f-154c7a8253a5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -12,7 +12,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "uuid_generate_v4()"
         },
         "userId": {
           "name": "userId",
@@ -71,7 +72,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "uuid_generate_v4()"
         },
         "name": {
           "name": "name",
@@ -117,7 +119,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "uuid_generate_v4()"
         },
         "userId": {
           "name": "userId",
@@ -182,7 +185,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "uuid_generate_v4()"
         },
         "parcelId": {
           "name": "parcelId",
@@ -260,7 +264,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "uuid_generate_v4()"
         },
         "trackingNumber": {
           "name": "trackingNumber",
@@ -284,7 +289,7 @@
           "name": "status",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "factualWeight": {
           "name": "factualWeight",
@@ -408,7 +413,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "uuid_generate_v4()"
         },
         "parcelId": {
           "name": "parcelId",
@@ -480,7 +486,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "uuid_generate_v4()"
         },
         "username": {
           "name": "username",
