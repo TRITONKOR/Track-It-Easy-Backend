@@ -35,6 +35,13 @@ const bootstrapFastify = (): FastifyInstance => {
         fastify.ready(() => {
             console.log(`\nAPI Structure\n${fastify.printRoutes()}`);
         });
+
+        fastify.register(cors, {
+            origin: true,
+            methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+            credentials: true,
+        });
     }
 
     fastify.register(fastifyRequestContext, {
@@ -55,13 +62,6 @@ const bootstrapFastify = (): FastifyInstance => {
             path: "/",
         },
         prefix: "x-",
-    });
-
-    fastify.register(cors, {
-        origin: true,
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
     });
 
     patchContext(fastify);
