@@ -39,7 +39,11 @@ const bootstrapFastify = (): FastifyInstance => {
         fastify.register(cors, {
             origin: true,
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-            allowedHeaders: ["Content-Type", "Authorization"],
+            allowedHeaders: [
+                "Content-Type",
+                "Authorization",
+                "x-authorization",
+            ],
             credentials: true,
         });
     }
