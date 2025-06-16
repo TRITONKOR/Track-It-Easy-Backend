@@ -4,7 +4,7 @@ import { config } from "./config/config";
 let fastify;
 
 const startServer = async () => {
-    fastify = bootstrapFastify();
+    fastify = await bootstrapFastify();
 
     try {
         await fastify.listen({

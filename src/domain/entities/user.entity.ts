@@ -9,6 +9,7 @@ export class User {
     role: "user" | "admin";
     createdAt: Date;
     updatedAt: Date;
+    apiKey: string | null;
 
     constructor(user: InferSelectModel<typeof usersTable>) {
         this.id = user.id;
@@ -18,5 +19,6 @@ export class User {
         this.role = user.role;
         this.createdAt = user.createdAt;
         this.updatedAt = user.updatedAt;
+        this.apiKey = user.apiKey ?? null;
     }
 }

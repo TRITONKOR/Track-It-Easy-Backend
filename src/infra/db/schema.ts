@@ -17,6 +17,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
 export const courierEnum = pgEnum("courierName", [
     "NovaPoshta",
     "MeestExpress",
+    "Ukrposhta",
 ]);
 export const actionTypeEnum = pgEnum(
     "action_type",
@@ -33,6 +34,7 @@ export const usersTable = pgTable("users", {
     role: userRoleEnum().default("user").notNull(),
     createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+    apiKey: varchar({ length: 255 }),
 });
 
 export const parcelsTable = pgTable("parcels", {
@@ -46,7 +48,6 @@ export const parcelsTable = pgTable("parcels", {
     statusId: uuid()
         .notNull()
         .references(() => statusesTable.id),
-    status: varchar({ length: 255 }).notNull(),
     factualWeight: varchar({ length: 255 }).notNull(),
     fromLocation: varchar({ length: 255 }).notNull(),
     toLocation: varchar({ length: 255 }).notNull(),

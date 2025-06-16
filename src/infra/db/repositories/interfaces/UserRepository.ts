@@ -7,6 +7,7 @@ export interface CreateUserData {
     role?: "admin" | "user";
     createdAt?: Date;
     updatedAt?: Date;
+    apiKey?: string;
 }
 
 export interface UpdateUserData {
@@ -14,6 +15,7 @@ export interface UpdateUserData {
     email?: string;
     role?: "admin" | "user";
     updatedAt?: Date;
+    apiKey?: string;
 }
 
 export interface IUserRepository {
@@ -65,4 +67,11 @@ export interface IUserRepository {
      * @returns Promise that resolves when deletion is complete
      */
     delete(id: string): Promise<void>;
+
+    /**
+     * Generates and saves a new API key for the user
+     * @param userId User ID
+     * @returns The generated API key
+     */
+    generateApiKey(userId: string): Promise<string>;
 }

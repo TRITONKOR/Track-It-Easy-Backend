@@ -17,12 +17,46 @@ interface LoginRequest extends RequestGenericInterface {
 
 const loginOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["auth", "public"],
         body: {
             type: "object",
             required: ["email", "password"],
             properties: {
                 email: { type: "string", format: "email" },
                 password: { type: "string" },
+            },
+        },
+        response: {
+            201: {
+                type: "object",
+                properties: {
+                    accessToken: { type: "string" },
+                    user: {
+                        type: "object",
+                        properties: {
+                            id: { type: "string" },
+                            username: { type: "string" },
+                            email: { type: "string" },
+                            role: { type: "string" },
+                            createdAt: { type: "string", format: "date-time" },
+                            updatedAt: { type: "string", format: "date-time" },
+                            apiKey: { type: ["string", "null"] },
+                        },
+                    },
+                },
+                required: ["accessToken", "user"],
+            },
+            400: {
+                type: "object",
+                properties: {
+                    message: { type: "string" },
+                },
+            },
+            500: {
+                type: "object",
+                properties: {
+                    message: { type: "string" },
+                },
             },
         },
     },

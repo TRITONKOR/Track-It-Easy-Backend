@@ -1,4 +1,5 @@
 import { User } from "@/domain/entities/user.entity";
+import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import { db } from "../index";
 import { usersTable } from "../schema";
@@ -56,5 +57,22 @@ export class UserRepository implements IUserRepository {
 
     async delete(id: string): Promise<void> {
         await db.delete(usersTable).where(eq(usersTable.id, id));
+    }
+
+    async generateApiKey(userId: string): Promise<string> {
+        const apiKey = crypto.randomBytes(32).toString("hex");
+        await db
+            .update(usersTable)
+            .set({ apiKey })
+            .where(eq(usersTable.id, userId));
+        return apiKey;
+    }
+
+    async findByApiKey(apiKey: string): Promise<User | null> {
+        const users = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.apiKey, apiKey));
+        return users[0] ? new User(users[0]) : null;
     }
 }

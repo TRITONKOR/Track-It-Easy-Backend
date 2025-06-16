@@ -17,7 +17,6 @@ export class RefreshAction {
         }
 
         try {
-            console.log("refreshToken", refreshToken);
             const sessionData = await this.authService.refreshTokensPair(
                 refreshToken
             );

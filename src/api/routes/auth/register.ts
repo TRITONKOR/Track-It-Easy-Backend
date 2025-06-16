@@ -16,13 +16,53 @@ interface RegisterRequest extends RequestGenericInterface {
 
 const registerOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["auth", "public"],
+        description: "Registers a new user account",
         body: {
             type: "object",
             required: ["username", "email", "password"],
             properties: {
                 username: { type: "string" },
-                email: { type: "string", format: "email" },
-                password: { type: "string", minLength: 6 },
+                email: {
+                    type: "string",
+                    format: "email",
+                },
+                password: {
+                    type: "string",
+                    minLength: 6,
+                },
+            },
+        },
+        response: {
+            201: {
+                description: "User registered successfully",
+                type: "object",
+                properties: {
+                    id: { type: "string", example: "a1b2c3d4" },
+                    username: { type: "string", example: "john_doe" },
+                    email: { type: "string", example: "john@example.com" },
+                    role: { type: "string", example: "user" },
+                },
+            },
+            400: {
+                description: "Validation or business error",
+                type: "object",
+                properties: {
+                    message: {
+                        type: "string",
+                        example: "Email already exists",
+                    },
+                },
+            },
+            500: {
+                description: "Unexpected server error",
+                type: "object",
+                properties: {
+                    message: {
+                        type: "string",
+                        example: "Internal server error",
+                    },
+                },
             },
         },
     },

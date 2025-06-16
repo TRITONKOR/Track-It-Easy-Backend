@@ -17,9 +17,12 @@ export class CourierRepository {
             .select()
             .from(couriersTable)
             .where(
-                eq(couriersTable.name, name as "NovaPoshta" | "MeestExpress")
+                eq(
+                    couriersTable.name,
+                    name as "NovaPoshta" | "MeestExpress" | "Ukrposhta"
+                )
             );
-        return new Courier(couriers[0]) || null;
+        return couriers[0] ? new Courier(couriers[0]) : null;
     }
 
     async findAll(): Promise<Courier[] | null> {

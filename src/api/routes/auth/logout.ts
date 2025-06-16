@@ -11,16 +11,37 @@ interface LogoutAuthRequest extends RequestGenericInterface {
 
 const refreshAuthOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["auth", "public"],
+        description: "Refreshes the session and returns a new access token",
         response: {
             200: {
+                description: "Successful token refresh",
                 type: "object",
                 properties: {
                     "x-auth-token": {
                         type: "string",
                         description: "Session access token",
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                     },
                 },
                 required: ["x-auth-token"],
+            },
+            401: {
+                description: "Invalid or missing refresh token",
+                type: "object",
+                properties: {
+                    message: { type: "string", example: "Unauthorized" },
+                },
+            },
+            500: {
+                description: "Unexpected server error",
+                type: "object",
+                properties: {
+                    message: {
+                        type: "string",
+                        example: "Internal server error",
+                    },
+                },
             },
         },
     },

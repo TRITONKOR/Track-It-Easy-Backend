@@ -5,6 +5,7 @@ import { TrackingService } from "@/domain/services/tracking.service";
 import { MeestExpressAdapter } from "@/domain/adapters/meestExpress.adapter";
 import { NovaPoshtaAdapter } from "@/domain/adapters/novaposhta.adapter";
 
+import { UkrposhtaAdapter } from "@/domain/adapters/ukrposhta.adapter";
 import { CourierService } from "@/domain/services/courier.service";
 import { ParcelService } from "@/domain/services/parcel.service";
 import { StatusService } from "@/domain/services/status.service";
@@ -30,6 +31,7 @@ const statusService = new StatusService(statusRepository);
 const trackingEventService = new TrackingEventService(trackingEventRepository);
 
 const novaposhtaAdapter = new NovaPoshtaAdapter();
+const ukrposhtaAdapter = new UkrposhtaAdapter();
 const meestExpressAdapter = new MeestExpressAdapter();
 
 const repositories = {
@@ -48,7 +50,8 @@ const services = {
         statusService,
         trackingEventService,
         novaposhtaAdapter,
-        meestExpressAdapter
+        meestExpressAdapter,
+        ukrposhtaAdapter
     ),
     authService: new AuthService(userRepository, jwtService),
     parcelService,

@@ -14,4 +14,16 @@ export const config = {
     NOVA_POSHTA_API_URL:
         process.env.NOVA_POSHTA_API_URL ||
         "https://api.novaposhta.ua/v2.0/json/",
+    NODEMAILER: {
+        host: process.env.NODEMAILER_HOST || "sandbox.smtp.mailtrap.io",
+        port: Number(process.env.NODEMAILER_PORT) || 587,
+        auth: {
+            user: process.env.NODEMAILER_USER || "a57eefe7156ea6",
+            pass: process.env.NODEMAILER_PASS || "6e599a1a8664e5",
+        },
+        from:
+            process.env.NODEMAILER_FROM ||
+            "Track It Easy <trackiteasymain@gmail.com>",
+    },
+    MOCK_URL: process.env.MOCK_URL || "http://mock-api:3001",
 };

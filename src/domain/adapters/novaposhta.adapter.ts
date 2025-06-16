@@ -89,6 +89,7 @@ export class NovaPoshtaAdapter implements ICourierAdapter {
                 data: {
                     trackingNumber,
                     status: this.mapStatus(parcelData.Status),
+                    courier: "Nova Poshta",
                     factualWeight: parcelData.FactualWeight,
                     fromLocation: parcelData.WarehouseSenderAddress,
                     toLocation: parcelData.WarehouseRecipientAddress,

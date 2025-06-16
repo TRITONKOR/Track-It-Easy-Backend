@@ -5,11 +5,11 @@ import {
     ITrackingResponse,
 } from "../services/tracking.service";
 
-export class MeestExpressAdapter implements ICourierAdapter {
+export class UkrposhtaAdapter implements ICourierAdapter {
     async trackParcel(trackingNumber: string): Promise<ITrackingResponse> {
         try {
             const response = await axios.get(
-                `${config.MOCK_URL}/mock/meestexpress/tracking/${trackingNumber}`
+                `${config.MOCK_URL}/mock/ukrposhta/tracking/${trackingNumber}`
             );
             if (!response.data.success) {
                 return {
@@ -23,7 +23,7 @@ export class MeestExpressAdapter implements ICourierAdapter {
                 data: {
                     trackingNumber: data.trackingNumber,
                     status: data.status,
-                    courier: "MeestExpress",
+                    courier: "Ukrposhta",
                     factualWeight: data.factualWeight,
                     fromLocation: data.fromLocation,
                     toLocation: data.toLocation,
@@ -34,12 +34,12 @@ export class MeestExpressAdapter implements ICourierAdapter {
             };
         } catch (error) {
             console.error(
-                "Error fetching tracking info from MeestExpress mock API:",
+                "Error fetching tracking info from Ukrposhta mock API:",
                 error
             );
             return {
                 success: false,
-                error: "Failed to fetch tracking info from MeestExpress",
+                error: "Failed to fetch tracking info from Ukrposhta",
             };
         }
     }

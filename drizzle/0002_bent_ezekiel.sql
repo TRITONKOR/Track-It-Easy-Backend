@@ -2,7 +2,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 SELECT uuid_generate_v4();
 
 CREATE TYPE "public"."action_type" AS ENUM('ban user', 'unban user', 'update parcel', 'delete parcel', 'delete tracking event');--> statement-breakpoint
-CREATE TYPE "public"."courierName" AS ENUM('NovaPoshta', 'MeestExpress');--> statement-breakpoint
+CREATE TYPE "public"."courierName" AS ENUM('NovaPoshta', 'Ukrposhta', 'MeestExpress');--> statement-breakpoint
 CREATE TYPE "public"."notification_type" AS ENUM('email', 'push');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('admin', 'user');--> statement-breakpoint
 CREATE TABLE "admin_actions" (
@@ -42,7 +42,6 @@ CREATE TABLE "parcels" (
 	"trackingNumber" varchar(255) NOT NULL,
 	"courierId" uuid NOT NULL,
 	"statusId" uuid NOT NULL,
-	"status" varchar(255) NOT NULL,
 	"factualWeight" varchar(255) NOT NULL,
 	"fromLocation" varchar(255) NOT NULL,
 	"toLocation" varchar(255) NOT NULL,
@@ -76,6 +75,7 @@ CREATE TABLE "users" (
 	"role" "user_role" DEFAULT 'user' NOT NULL,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"apiKey" varchar(255),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -97,7 +97,8 @@ ALTER TABLE "tracking_events" ADD CONSTRAINT "tracking_events_parcelId_parcels_i
 
 INSERT INTO couriers ("id", "name", "api", "createdAt", "updatedAt") VALUES
   ('c070ad2f-4b75-484d-be4d-f50869a53a06', 'NovaPoshta', 'https://api.novaposhta.ua', NOW(), NOW()),
-  ('0d081c9d-c4e4-4f7b-a186-6e98d6f814fb', 'MeestExpress', 'https://api.meest.com', NOW(), NOW());
+  ('0d081c9d-c4e4-4f7b-a186-6e98d6f814fb', 'MeestExpress', 'http://mock-api:3001', NOW(), NOW()),
+  ('9c8cbe20-41fc-4835-9372-1deb3d30e019', 'Ukrposhta', 'http://mock-api:3001', NOW(), NOW());
 
 INSERT INTO "users" ("id", "username", "email", "passwordHash", "role", "createdAt", "updatedAt")
 VALUES

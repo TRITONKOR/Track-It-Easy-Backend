@@ -1,4 +1,9 @@
-import { followedParcelsTable, parcelsTable } from "@db/schema";
+import {
+    couriersTable,
+    followedParcelsTable,
+    parcelsTable,
+    statusesTable,
+} from "@db/schema";
 import { and, eq } from "drizzle-orm";
 import { Parcel } from "../../../domain/entities/parcel.entity";
 import { db } from "../index";
@@ -37,8 +42,9 @@ export class ParcelRepository {
                 id: parcelsTable.id,
                 trackingNumber: parcelsTable.trackingNumber,
                 courierId: parcelsTable.courierId,
+                courier: couriersTable.name,
                 statusId: parcelsTable.statusId,
-                status: parcelsTable.status,
+                status: statusesTable.name,
                 fromLocation: parcelsTable.fromLocation,
                 toLocation: parcelsTable.toLocation,
                 factualWeight: parcelsTable.factualWeight,
@@ -49,6 +55,14 @@ export class ParcelRepository {
             .innerJoin(
                 parcelsTable,
                 eq(followedParcelsTable.parcelId, parcelsTable.id)
+            )
+            .innerJoin(
+                couriersTable,
+                eq(parcelsTable.courierId, couriersTable.id)
+            )
+            .innerJoin(
+                statusesTable,
+                eq(parcelsTable.statusId, statusesTable.id)
             )
             .where(eq(followedParcelsTable.userId, userId));
 
@@ -106,8 +120,9 @@ export class ParcelRepository {
                 id: parcelsTable.id,
                 trackingNumber: parcelsTable.trackingNumber,
                 courierId: parcelsTable.courierId,
+                courier: couriersTable.name,
                 statusId: parcelsTable.statusId,
-                status: parcelsTable.status,
+                status: statusesTable.name,
                 fromLocation: parcelsTable.fromLocation,
                 toLocation: parcelsTable.toLocation,
                 createdAt: parcelsTable.createdAt,
@@ -118,6 +133,14 @@ export class ParcelRepository {
             .innerJoin(
                 parcelsTable,
                 eq(followedParcelsTable.parcelId, parcelsTable.id)
+            )
+            .innerJoin(
+                couriersTable,
+                eq(parcelsTable.courierId, couriersTable.id)
+            )
+            .innerJoin(
+                statusesTable,
+                eq(parcelsTable.statusId, statusesTable.id)
             )
             .execute();
 

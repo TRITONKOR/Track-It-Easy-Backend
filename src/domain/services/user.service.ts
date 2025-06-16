@@ -102,4 +102,8 @@ export class UserService {
             throw new HttpException(500, "Error deleting user");
         }
     }
+
+    async generateApiKey(userId: string): Promise<string> {
+        return this.userRepository.generateApiKey(userId);
+    }
 }

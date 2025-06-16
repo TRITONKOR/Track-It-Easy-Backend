@@ -1,4 +1,5 @@
 import cors from "@fastify/cors";
+import rateLimit from "@fastify/rate-limit";
 import fastifyRequestContext from "@fastify/request-context";
 import fastifyRequestLogger from "@mgcrea/fastify-request-logger";
 import Fastify, { FastifyInstance } from "fastify";
@@ -9,8 +10,9 @@ import { config } from "./config/config";
 import { authenticateToken } from "./middleware/authMiddleware";
 
 import fastifyCookie from "@fastify/cookie";
+import { registerPublicSwagger } from "./config/swagger/publicSwagger";
 
-const bootstrapFastify = (): FastifyInstance => {
+const bootstrapFastify = async (): Promise<FastifyInstance> => {
     const fastify = Fastify({
         exposeHeadRoutes: false,
         connectionTimeout: 20000,
@@ -48,6 +50,11 @@ const bootstrapFastify = (): FastifyInstance => {
         });
     }
 
+    fastify.register(rateLimit, {
+        max: 100,
+        timeWindow: "1 minute",
+    });
+
     fastify.register(fastifyRequestContext, {
         hook: "preValidation",
         defaultStoreValues: {
@@ -68,6 +75,8 @@ const bootstrapFastify = (): FastifyInstance => {
         prefix: "x-",
     });
 
+    registerPublicSwagger(fastify);
+
     patchContext(fastify);
     patchRouting(fastify);
 
@@ -76,12 +85,20 @@ const bootstrapFastify = (): FastifyInstance => {
         "/auth/register",
         "/auth/refresh",
         "/track",
+        "/follow-parcel",
+        "/unfollow-parcel",
     ];
 
+    //const apiKeyRoutes = ["/track", "/follow-parcel", "/unfollow-parcel"];
+
     fastify.addHook("preHandler", async (request, reply) => {
-        const routePath = request.routeOptions.url ?? "";
-        if (publicRoutes.includes(routePath)) {
-            console.log("Public route, skipping authentication:", routePath);
+        const routePath = request.raw.url ?? "";
+
+        if (
+            routePath.startsWith("/docs") ||
+            routePath.startsWith("/admin-docs") ||
+            publicRoutes.includes(request.routeOptions.url ?? "")
+        ) {
             return;
         }
 

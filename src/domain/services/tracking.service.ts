@@ -2,6 +2,7 @@ import { ParcelRepository } from "@db/repositories/parcel.repo";
 import EventEmitter from "events";
 import { MeestExpressAdapter } from "../adapters/meestExpress.adapter";
 import { NovaPoshtaAdapter } from "../adapters/novaposhta.adapter";
+import { UkrposhtaAdapter } from "../adapters/ukrposhta.adapter";
 import { Parcel } from "../entities/parcel.entity";
 import { TrackingEvent } from "../entities/trackingEvent.entity";
 import { CourierService } from "./courier.service";
@@ -9,7 +10,9 @@ import { StatusService } from "./status.service";
 import { TrackingEventService } from "./trackingEvent.service";
 
 import { ParcelAlreadyExistsException } from "@/api/errors/httpException";
-import { CronJob } from "cron";
+import { sendStatusUpdateEmail } from "@/utils/mailer";
+import { getUsersByFollowedParcel } from "@db/repositories/followedParcels.repo";
+import nodeCron from "node-cron";
 
 export interface ICourierAdapter {
     trackParcel(trackingNumber: string): Promise<ITrackingResponse>;
@@ -26,6 +29,7 @@ export interface ITrackingResponse {
     data?: {
         trackingNumber: string;
         status: string;
+        courier: string;
         factualWeight: string;
         fromLocation?: string;
         toLocation?: string;
@@ -51,7 +55,7 @@ export class TrackingService {
     private eventEmitter: EventEmitter;
     private updateInProgress = false;
     private updateTimeout?: NodeJS.Timeout;
-    private backgroundUpdateJob: CronJob | null = null;
+    private backgroundUpdateJob: any = null;
 
     private readonly FINAL_STATUSES = [
         "Доставлено",
@@ -67,7 +71,8 @@ export class TrackingService {
         trackingEventService: TrackingEventService,
         novaPoshtaAdapter: NovaPoshtaAdapter,
         meestExpressAdapter: MeestExpressAdapter,
-        updateIntervalMs: string = "0 */1 * * *"
+        ukrposhtaAdapter: UkrposhtaAdapter,
+        updateIntervalMs: string = "0 * * * *"
     ) {
         this.parcelRepository = parcelRepository;
         this.courierService = courierService;
@@ -79,7 +84,8 @@ export class TrackingService {
 
         this.adapters = new Map<string, ICourierAdapter>([
             ["NovaPoshta", novaPoshtaAdapter],
-            //["MeestExpress", meestExpressAdapter],
+            ["Ukrposhta", ukrposhtaAdapter],
+            ["MeestExpress", meestExpressAdapter],
         ]);
     }
 
@@ -94,7 +100,7 @@ export class TrackingService {
         }
 
         try {
-            this.backgroundUpdateJob = new CronJob(
+            this.backgroundUpdateJob = nodeCron.schedule(
                 this.updateInterval,
                 async () => {
                     console.log(
@@ -121,9 +127,7 @@ export class TrackingService {
                         );
                     }
                 },
-                null,
-                true,
-                "UTC"
+                { timezone: "UTC" }
             );
 
             console.log("Background updates started successfully");
@@ -183,7 +187,6 @@ export class TrackingService {
 
         const status = (await this.statusService.findById(parcel.statusId))
             .name;
-
         if (status && this.FINAL_STATUSES.includes(status)) {
             return;
         }
@@ -204,7 +207,6 @@ export class TrackingService {
                 parcel.id,
                 {
                     statusId: status.id,
-                    status: result.data.status,
                     fromLocation: result.data.fromLocation,
                     toLocation: result.data.toLocation,
                     factualWeight: result.data.factualWeight,
@@ -227,6 +229,37 @@ export class TrackingService {
                             isNotified: false,
                         })
                 ) || [];
+
+            const oldEvents =
+                (await this.trackingEventService.findByParcelId(parcel.id)) ||
+                [];
+            const lastOldEvent =
+                oldEvents.length > 0 ? oldEvents[oldEvents.length - 1] : null;
+            const lastNewEvent =
+                newEvents.length > 0 ? newEvents[newEvents.length - 1] : null;
+            if (
+                lastNewEvent &&
+                lastOldEvent &&
+                lastNewEvent.statusLocation !== lastOldEvent.statusLocation
+            ) {
+                console.log(
+                    `[NOTIFY] Parcel ${parcel.trackingNumber}: statusLocation changed from '${lastOldEvent.statusLocation}' to '${lastNewEvent.statusLocation}'. Sending emails to followers...`
+                );
+                const users = await getUsersByFollowedParcel(parcel.id);
+                for (const user of users) {
+                    if (user.email) {
+                        console.log(
+                            `[EMAIL] Sending status update to ${user.email} for parcel ${parcel.trackingNumber} (status: ${lastNewEvent.rawStatus}, location: ${lastNewEvent.statusLocation})`
+                        );
+                        await sendStatusUpdateEmail(
+                            user.email,
+                            parcel.trackingNumber,
+                            lastNewEvent.rawStatus,
+                            lastNewEvent.statusLocation
+                        );
+                    }
+                }
+            }
 
             await this.trackingEventService.checkAndUpdateTrackingEvents(
                 parcel.id,
@@ -285,9 +318,6 @@ export class TrackingService {
         userId?: string
     ): Promise<ITrackingResponse> {
         try {
-            // const courier = await this.courierService.findById(
-            //     parcel.courierId
-            // );
             const status = await this.statusService.findById(parcel.statusId);
             const events = await this.trackingEventService.findByParcelId(
                 parcel.id
@@ -298,6 +328,9 @@ export class TrackingService {
                 data: {
                     trackingNumber: parcel.trackingNumber,
                     status: status.name,
+                    courier: (
+                        await this.courierService.findById(parcel.courierId)
+                    ).name,
                     factualWeight: parcel.factualWeight,
                     fromLocation: parcel.fromLocation,
                     toLocation: parcel.toLocation,
@@ -347,7 +380,6 @@ export class TrackingService {
                         trackingNumber,
                         courierId: courier.id,
                         statusId: status.id,
-                        status: result.data.status,
                         fromLocation: result.data.fromLocation,
                         toLocation: result.data.toLocation,
                         factualWeight: result.data.factualWeight,
