@@ -2,7 +2,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 SELECT uuid_generate_v4();
 
 CREATE TYPE "public"."action_type" AS ENUM('ban user', 'unban user', 'update parcel', 'delete parcel', 'delete tracking event');--> statement-breakpoint
-CREATE TYPE "public"."courierName" AS ENUM('NovaPoshta', 'Ukrposhta', 'MeestExpress');--> statement-breakpoint
+CREATE TYPE "public"."courierName" AS ENUM('NovaPoshta', 'MeestExpress', 'Ukrposhta');--> statement-breakpoint
 CREATE TYPE "public"."notification_type" AS ENUM('email', 'push');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('admin', 'user');--> statement-breakpoint
 CREATE TABLE "admin_actions" (
@@ -88,7 +88,7 @@ ALTER TABLE "parcels" ADD CONSTRAINT "parcels_courierId_couriers_id_fk" FOREIGN 
 ALTER TABLE "parcels" ADD CONSTRAINT "parcels_statusId_statuses_id_fk" FOREIGN KEY ("statusId") REFERENCES "public"."statuses"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tracking_events" ADD CONSTRAINT "tracking_events_parcelId_parcels_id_fk" FOREIGN KEY ("parcelId") REFERENCES "public"."parcels"("id") ON DELETE cascade ON UPDATE no action;
 
-    INSERT INTO statuses ("id", "name", "description", "createdAt") VALUES
+INSERT INTO statuses ("id", "name", "description", "createdAt") VALUES
   ('5b3dc5f2-6dad-4200-a6c0-72ff8b14c363', 'В дорозі', 'Наразі посилка знаходиться в процесі транспортування.', NOW()),
   ('24d38b9c-40af-4b71-99f7-10710c32fdeb', 'Доставлено', 'Посилка доставлена одержувачу.', NOW()),
   ('d2677e7e-19ef-473a-b557-18924ec5ebec', 'Очікується', 'Посилка очікує на обробку.', NOW()),
