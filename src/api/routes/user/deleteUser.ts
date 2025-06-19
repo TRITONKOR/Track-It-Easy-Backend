@@ -14,6 +14,7 @@ interface DeleteUserRequest extends RequestGenericInterface {
 
 const deleteUserOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["users"],
         params: {
             type: "object",
             properties: {

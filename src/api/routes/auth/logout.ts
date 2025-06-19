@@ -11,7 +11,7 @@ interface LogoutAuthRequest extends RequestGenericInterface {
 
 const refreshAuthOptions: RouteShorthandOptions = {
     schema: {
-        tags: ["auth", "public"],
+        tags: ["auth"],
         description: "Refreshes the session and returns a new access token",
         response: {
             200: {

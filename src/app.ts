@@ -85,11 +85,10 @@ const bootstrapFastify = async (): Promise<FastifyInstance> => {
         "/auth/register",
         "/auth/refresh",
         "/track",
-        "/follow-parcel",
-        "/unfollow-parcel",
+        "/api/v1/track",
+        "/api/v1/follow-parcel",
+        "/api/v1/unfollow-parcel",
     ];
-
-    //const apiKeyRoutes = ["/track", "/follow-parcel", "/unfollow-parcel"];
 
     fastify.addHook("preHandler", async (request, reply) => {
         const routePath = request.raw.url ?? "";

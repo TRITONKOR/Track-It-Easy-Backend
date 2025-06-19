@@ -16,7 +16,7 @@ interface RegisterRequest extends RequestGenericInterface {
 
 const registerOptions: RouteShorthandOptions = {
     schema: {
-        tags: ["auth", "public"],
+        tags: ["auth"],
         description: "Registers a new user account",
         body: {
             type: "object",

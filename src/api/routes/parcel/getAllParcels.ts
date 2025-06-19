@@ -14,6 +14,7 @@ interface GetAllParcelsRequest extends RequestGenericInterface {
 
 const getAllParcelsOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["parcels"],
         response: {
             200: {
                 type: "array",

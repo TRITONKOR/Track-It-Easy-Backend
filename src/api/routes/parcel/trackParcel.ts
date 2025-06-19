@@ -16,7 +16,7 @@ interface TrackParcelRequest extends RequestGenericInterface {
 
 const trackOptions: RouteShorthandOptions = {
     schema: {
-        tags: ["tracking", "public"],
+        tags: ["tracking"],
         description:
             "Tracks a parcel by its tracking number. Optionally associates it with a user.",
         body: {

@@ -14,6 +14,7 @@ interface DeleteParcelRequest extends RequestGenericInterface {
 
 const deleteParcelOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["parcels"],
         params: {
             type: "object",
             properties: {

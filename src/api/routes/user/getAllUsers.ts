@@ -12,6 +12,7 @@ interface GetAllUsersRequest extends RequestGenericInterface {
 
 const getAllUsersOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["users"],
         response: {
             200: {
                 type: "array",

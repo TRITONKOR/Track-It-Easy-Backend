@@ -13,6 +13,8 @@ export async function registerPublicSwagger(app: FastifyInstance) {
             tags: [
                 { name: "auth", description: "Authentication" },
                 { name: "tracking", description: "Parcel tracking" },
+                { name: "parcels", description: "Parcel management" },
+                { name: "api-key", description: "API key management" },
             ],
         },
     });

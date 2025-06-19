@@ -1,4 +1,5 @@
 import { FastifyInstance } from "fastify";
+import { apiV1Router } from "./api/v1";
 import { authRouter } from "./auth";
 import { parcelRouter } from "./parcel";
 import { userRouter } from "./user";
@@ -30,4 +31,5 @@ const registerRoutes = (fastify: FastifyInstance) => {
     fastify.register(authRouter);
     fastify.register(parcelRouter);
     fastify.register(userRouter);
+    fastify.register(apiV1Router);
 };

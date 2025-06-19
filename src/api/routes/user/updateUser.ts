@@ -19,6 +19,7 @@ interface UpdateUserRequest extends RequestGenericInterface {
 
 const updateUserOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["users"],
         params: {
             type: "object",
             properties: {

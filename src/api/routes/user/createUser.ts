@@ -17,6 +17,7 @@ interface CreateUserRequest extends RequestGenericInterface {
 
 const createUserOptions: RouteShorthandOptions = {
     schema: {
+        tags: ["users"],
         body: {
             type: "object",
             required: ["username", "email", "password", "role"],

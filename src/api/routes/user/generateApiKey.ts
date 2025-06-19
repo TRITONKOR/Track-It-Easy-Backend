@@ -14,7 +14,7 @@ interface GenerateApiKeyRequest extends RequestGenericInterface {
 
 const generateApiKeyOptions: RouteShorthandOptions = {
     schema: {
-        tags: ["users", "admin"],
+        tags: ["api-key"],
         summary: "Generate a new API key for a user",
         params: {
             type: "object",
