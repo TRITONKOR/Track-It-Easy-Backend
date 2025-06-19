@@ -21,7 +21,29 @@ export class ParcelRepository {
     }
 
     async findAll(): Promise<Parcel[]> {
-        const parcels = await db.select().from(parcelsTable);
+        const parcels = await db
+            .select({
+                id: parcelsTable.id,
+                trackingNumber: parcelsTable.trackingNumber,
+                courierId: parcelsTable.courierId,
+                courier: couriersTable.name,
+                statusId: parcelsTable.statusId,
+                status: statusesTable.name,
+                fromLocation: parcelsTable.fromLocation,
+                toLocation: parcelsTable.toLocation,
+                factualWeight: parcelsTable.factualWeight,
+                createdAt: parcelsTable.createdAt,
+                updatedAt: parcelsTable.updatedAt,
+            })
+            .from(parcelsTable)
+            .innerJoin(
+                couriersTable,
+                eq(parcelsTable.courierId, couriersTable.id)
+            )
+            .innerJoin(
+                statusesTable,
+                eq(parcelsTable.statusId, statusesTable.id)
+            );
         return parcels.map((p) => new Parcel(p));
     }
 
