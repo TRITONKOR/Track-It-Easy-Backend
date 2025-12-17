@@ -30,8 +30,6 @@ RUN npm install --production
 # Копіюємо скомпільовані файли з білд-стадії
 COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
 
-# Якщо потрібні якісь статичні файли або конфіги, то їх також можна скопіювати
-# COPY --from=builder --chown=appuser:appgroup /app/some_static_folder ./some_static_folder
 
 USER appuser
 
