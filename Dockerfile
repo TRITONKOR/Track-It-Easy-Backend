@@ -6,14 +6,17 @@ WORKDIR /app
 # Копіюємо package.json і package-lock.json для кешування залежностей
 COPY package.json package-lock.json ./
 
-# Встановлюємо всі залежності (включно з dev)
+# Встановлюємо всі залежності (dev + prod)
 RUN npm install
 
 # Копіюємо весь код
 COPY . .
 
-# Запускаємо збірку TypeScript (припускаємо, що в package.json є "build": "tsc")
+# Запускаємо збірку TypeScript
 RUN npm run build
+
+ENV DATABASE_URL=postgresql://postgres:kGuvkrQrPhUDXAVDcOqmxBnoZnpLkQAt@postgres.railway.internal:5432/railway
+RUN npx drizzle-kit push --config ./drizzle.config.ts
 
 # -------- Production Stage --------
 FROM node:22-alpine
@@ -27,14 +30,12 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install --production
 
-# Копіюємо скомпільовані файли з білд-стадії
+# Копіюємо з build stage тільки dist
 COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
 
-
 USER appuser
-
 ENV NODE_ENV=production
 EXPOSE 3000
 
-# Запускаємо скомпільований сервер
+# Запускаємо сервер
 CMD ["node", "dist/server.js"]
